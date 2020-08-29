@@ -219,7 +219,7 @@ namespace Test.Event
             DateTime start, DateTime end, string text, int fontSize, int cellDuration, int cellWidth, BarWidth barWidth)
         {
             var ev = new DayPilot.Web.Ui.Event(id, dayStart, dayEnd, start, end,
-                default, default, text, "","",ACType.RRJ, null, fontSize, cellWidth, cellDuration, 1, "", "", "", 0,0, "");
+                default, default, text, "","",ACType.RRJ, null, fontSize, cellWidth, cellDuration, 1, "", "", "", "");
 
             var result = ev.SetBoxes(dayStart, dayEnd, fontSize, cellWidth, cellDuration);
 

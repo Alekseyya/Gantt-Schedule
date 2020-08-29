@@ -21,6 +21,9 @@ namespace Core.Model
         [Display(Name = "СББ")]
         Saturday,
     }
+
+    
+
     public enum ACType
     {
         [Display(Name = "Все")]
@@ -178,7 +181,7 @@ namespace Core.Model
         /// <summary>
         /// Количество дней на которые отличаются даты прибытия
         /// </summary>
-        public int ArrivalDifDays { get; set; }
+        //public int ArrivalDifDays { get; set; }
 
         /// <summary>
         /// время вылета после TO
@@ -188,7 +191,7 @@ namespace Core.Model
         /// <summary>
         /// Количество дне йн которые отличаются даты отправления
         /// </summary>
-        public int DepartureDifDays { get; set; }
+        //public int DepartureDifDays { get; set; }
 
         /// <summary>
         /// Список и конфигурация работ

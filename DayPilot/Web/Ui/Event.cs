@@ -51,8 +51,6 @@ namespace DayPilot.Web.Ui
         /// </summary>
         public DateTime Arrival;
 
-        public int ArrivalDifDays;
-
 		/// <summary>
 		/// Event end;
 		/// </summary>
@@ -62,8 +60,6 @@ namespace DayPilot.Web.Ui
         /// время вылета после TO
         /// </summary>
         public DateTime Departure;
-
-        public int DepartureDifDays;
 
         /// <summary>
 		/// Event name;
@@ -132,8 +128,7 @@ namespace DayPilot.Web.Ui
             DateTime start, DateTime end, DateTime arrival, DateTime departure,
             string text, string resource, string resourceName, ACType acType, object source, 
             int fontSize, int cellWidth, int cellDuration, Int64 wpnoi,
-            string wpno, string mhr, string bookedMHR, int arrivalDifDays, 
-            int departureDifDays, string stationName)
+            string wpno, string mhr, string bookedMHR, string stationName)
         {
             this.Id = id;
             this.Start = start;
@@ -148,8 +143,6 @@ namespace DayPilot.Web.Ui
             this.WPNO = wpno;
             this.MHR = mhr;
             this.BookedMHR = bookedMHR;
-            this.ArrivalDifDays = arrivalDifDays;
-            this.DepartureDifDays = departureDifDays;
             this.StationName = stationName;
             Source = source;
             var boxes = SetBoxes(dayStart, dayEnd, fontSize, cellWidth, cellDuration);

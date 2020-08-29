@@ -22,12 +22,11 @@ namespace Core.Mapping
                 .ForMember(dao => dao.AC_TYP, e => e.MapFrom(o => CovertToACTypeEnum(o)))
                 .ForMember(dao => dao.AC_MODEL, e => e.MapFrom(o => CovertToACModelEnum(o)))
                 .ForMember(dao => dao.CONTAINS_C_CHECK, e => e.MapFrom(o => ContainsCheckToBool(o.CONTAINS_C_CHECK)))
-                .ForMember(dao => dao.DepartureDifDays, e => e.MapFrom(o => o.DEPARTURE_DIF_DAYS))
-                .ForMember(dao => dao.ArrivalDifDays, e => e.MapFrom(o => o.ARRIVAL_DIF_DAYS))
                 .ForMember(dao => dao.WPNO, e => e.MapFrom(o => o.WPNO))
                 .ForMember(dao => dao.WPNO_I, e => e.MapFrom(o => o.WPNO_I))
                 .ForMember(dao => dao.STATION, e => e.MapFrom(o => o.STATION))
                 .ForMember(dao => dao.STATION_NAME, e => e.MapFrom(o => o.STATION_NAME))
+                .ForMember(dao => dao.Description, e => e.MapFrom(o => ConcatenateFields(o)))
                 .ForMember(dao => dao.ParentWpno, e => e.MapFrom(o => o.PARENT_WPNO_I));
         }
         public DateTime ConvertToDateTime(WpPlan wpPlan, string date, string field)
@@ -42,6 +41,14 @@ namespace Core.Mapping
             if (!string.IsNullOrEmpty(check) && check.Contains("Y"))
                 return true;
             return false;
+        }
+
+        public string ConcatenateFields(WpPlan wpPlan)
+        {
+            var mhrPlan = wpPlan.MHR != 0 ? $" - {wpPlan.MHR} MH" : "";
+            var remarks = !string.IsNullOrEmpty(wpPlan.INTERNAL_REMARKS) ? wpPlan.INTERNAL_REMARKS + "<br/>" : "";
+            var name = $"{remarks}{wpPlan.AC_MODEL} {wpPlan.AC_REGISTR} {wpPlan.DESCRIPTION}{mhrPlan}";
+            return name;
         }
 
         public ACType CovertToACTypeEnum(WpPlan wpPlan)

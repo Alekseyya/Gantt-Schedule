@@ -62,10 +62,10 @@ namespace DayPilot.Web.Ui
 
         private string _dataStartField;
         private string _arrivalField;
-        private string _arrivalDifDaysField;
+        //private string _arrivalDifDaysField;
         private string _dataEndField;
         private string _departureField;
-        private string _departureDifDaysField;
+        //private string _departureDifDaysField;
         private string _dataTextField;
         private string _dataValueField;
         private string _dataResourceField;
@@ -998,15 +998,7 @@ namespace DayPilot.Web.Ui
         private (string divStartText, string divEndText) CreateTimeStartEnd(Day day, Event ev)
         {
             var arrivalDifDays = string.Empty;
-            if (ev.ArrivalDifDays > 0 && ev.ArrivalDifDays != 0)
-                arrivalDifDays = "+" + ev.ArrivalDifDays;
-            else if (ev.ArrivalDifDays != 0)
-                arrivalDifDays = ev.ArrivalDifDays.ToString();
             var departureDifDays = string.Empty;
-            if (ev.DepartureDifDays > 0 && ev.DepartureDifDays != 0)
-                departureDifDays = "+" + ev.DepartureDifDays;
-            else if (ev.DepartureDifDays != 0)
-                departureDifDays = ev.DepartureDifDays.ToString();
 
             var arrival = (ev.Arrival == DateTime.MinValue || ev.Arrival == DateTime.MaxValue) ? "" :
                 $" ({ev.Arrival.ToString("t")}{arrivalDifDays})";
@@ -2104,25 +2096,25 @@ namespace DayPilot.Web.Ui
             }
         }
 
-        [Description("Количество дней, на которое отличаются даты прибытия и начала ТО")]
-        [Category("Data")]
-        public string ArrivalDifDaysField
-        {
-            get
-            {
-                return _arrivalDifDaysField;
-            }
-            set
-            {
-                _arrivalDifDaysField = value;
+        //[Description("Количество дней, на которое отличаются даты прибытия и начала ТО")]
+        //[Category("Data")]
+        //public string ArrivalDifDaysField
+        //{
+        //    get
+        //    {
+        //        return _arrivalDifDaysField;
+        //    }
+        //    set
+        //    {
+        //        _arrivalDifDaysField = value;
 
-                if (Initialized)
-                {
-                    OnDataPropertyChanged();
-                }
+        //        if (Initialized)
+        //        {
+        //            OnDataPropertyChanged();
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
         /// <summary>
         /// Gets or sets the name of the column that contains the event ending date and time (must be convertible to DateTime).
@@ -2163,23 +2155,23 @@ namespace DayPilot.Web.Ui
             }
         }
 
-        [Description("Количество дней, на которое отличаются даты отправления и окончания ТО")]
-        [Category("Data")]
-        public string DepartureDifDaysField
-        {
-            get
-            {
-                return _departureDifDaysField;
-            }
-            set
-            {
-                _departureDifDaysField = value;
-                if (Initialized)
-                {
-                    OnDataPropertyChanged();
-                }
-            }
-        }
+        //[Description("Количество дней, на которое отличаются даты отправления и окончания ТО")]
+        //[Category("Data")]
+        //public string DepartureDifDaysField
+        //{
+        //    get
+        //    {
+        //        return _departureDifDaysField;
+        //    }
+        //    set
+        //    {
+        //        _departureDifDaysField = value;
+        //        if (Initialized)
+        //        {
+        //            OnDataPropertyChanged();
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Gets or sets the  name of the column that contains the name of an event.
@@ -3162,16 +3154,6 @@ namespace DayPilot.Web.Ui
                 else
                     throw new FormatException(String.Format("Null '{0}' (from WPNO column)", wpno));
 
-                if (!int.TryParse(DataBinder.GetPropertyValue(dataItem, ArrivalDifDaysField, null), out int arrivalDifDays))
-                {
-                    throw new FormatException(String.Format("Unable to convert int '{0}' (from ArrivalDifDaysField column)", arrivalDifDays));
-                }
-
-                if (!int.TryParse(DataBinder.GetPropertyValue(dataItem, DepartureDifDaysField, null), out int departureDifDays))
-                {
-                    throw new FormatException(String.Format("Unable to convert int '{0}' (from DepartureDifDaysField column)", departureDifDays));
-                }
-
                 string strStart = DataBinder.GetPropertyValue(dataItem, DataStartField, null);
                 if (!DateTime.TryParse(strStart, out start))
                 {
@@ -3217,8 +3199,7 @@ namespace DayPilot.Web.Ui
                 }
 
                 ((ArrayList)ViewState["Items"]).Add(new Event(val, StartDate, EndDate, start, end, arrivalDateTime, departureDateTime,
-                    name, resourceId, resourceName, acType,  dataItem, Convert.ToInt32(EventFontSize.Replace("px", "")), CellWidth, CellDuration, wpnoi, wpno, mhr, bookedMHR,
-                    arrivalDifDays, departureDifDays, stationName));
+                    name, resourceId, resourceName, acType,  dataItem, Convert.ToInt32(EventFontSize.Replace("px", "")), CellWidth, CellDuration, wpnoi, wpno, mhr, bookedMHR, stationName));
 
             }
             //Убрать если хочется, чтобы компактно выглядело

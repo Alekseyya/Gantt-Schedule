@@ -93,12 +93,7 @@ namespace WebApp.Controllers
                 {
                     dateTimeStartTO = dateTimeStartTO.StartOfDay();
                     dateTimeEndTO = dateTimeEndTO.EndOfDay();
-                    ViewBag.WorkPackagePlanReportPTO = GetWorkPackagePlanReportPTO(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
-                    ViewBag.WorkPackagePlanReportOTO = GetWorkPackageReportOTO(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
-                    ////ViewBag.WorkPackagePlanReportWOUT = GetWorkPackagePlanReportWOUT(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
-                    ViewBag.WorkPackagePlanReportTOOUT = GetWorkPackagePlanReportTOOUT(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
-                    ViewBag.WorkPackagePlanReportAT = GetWorkPackagePlanReportAT(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
-                    ViewBag.WorkPackagePlanReportWDTM = GetWorkPackagePlanReportWDTM(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
+                    ViewBag.WorkPackagePlanReportPTO = GetWorkPlanReport(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
                 }
             }
             ViewBag.DateStartTO = dateTimeStartTO.ToShortDateString();
@@ -129,8 +124,7 @@ namespace WebApp.Controllers
             return View();
         }
 
-        protected string GetWorkPackagePlanReportWDTM(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, 
-            bool oneHeader = false)
+        protected string GetWorkPlanReport(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, bool oneHeader = false)
         {
             string html = "";
 
@@ -140,477 +134,10 @@ namespace WebApp.Controllers
             scheduler.HeaderHeight = 16;
             scheduler.DataStartField = "start";
             scheduler.ArrivalField = "arrival";
-            scheduler.ArrivalDifDaysField = "arrivalDifDays";
+            //scheduler.ArrivalDifDaysField = "arrivalDifDays";
             scheduler.DataEndField = "end";
             scheduler.DepartureField = "departure";
-            scheduler.DepartureDifDaysField = "departureDifDays";
-            scheduler.DataTextField = "name";
-            scheduler.DataValueField = "id";
-            scheduler.DataResourceField = "resource";
-            scheduler.EventFontSize = "10px";
-            scheduler.WPNOIField = "wpnoi";
-            scheduler.WPNOField = "wpno";
-            scheduler.MHRField = "mhr";
-            scheduler.BookedMHRField = "bookedMHR";
-            scheduler.DataResourceNameField = "resourceName";
-            scheduler.ACTypeField = "acType";
-            scheduler.StationNameField = "stationName";
-
-
-            //отображение по дням без вертикальных линий по два часа
-            /*scheduler.CellDuration = 1440;
-            scheduler.CellWidth = 120;
-            scheduler.EventHeight = 45;
-            scheduler.RowHeaderWidth = 120;
-            scheduler.TwoHeaders = false;*/
-
-            //отображение по два часа с дополнительным заголовком
-            scheduler.CellDuration = 120;
-            scheduler.CellWidth = 15;
-            scheduler.TimeSpendingHeight = 14;
-            scheduler.HeightBar = 4;
-            scheduler.EventHeight = 50 + scheduler.TimeSpendingHeight;
-
-
-            scheduler.RowHeaderWidth = 90;
-            if (!oneHeader)
-                scheduler.TwoHeaders = true;
-
-
-
-            scheduler.BeforeEventRender += new BeforeEventRenderEventHandler(DayPilotScheduler_BeforeEventRender);
-            scheduler.EventClickHandling = DayPilot.Web.Ui.Enums.EventClickHandlingEnum.JavaScript;
-            scheduler.TimeRangeSelectedHandling = DayPilot.Web.Ui.Enums.TimeRangeSelectedHandling.Disabled;
-
-
-            scheduler.CssOnly = true;
-            scheduler.CssClassPrefix = "scheduler_transparent";
-
-
-            scheduler.TimeFormat = DayPilot.Web.Ui.Enums.TimeFormat.Clock24Hours;
-
-            var listResources = new List<Resource>()
-            {
-                new Resource("Стоянка", "A", new List<string>(){"PL07", "PL070"}, new List<ACType>() {ACType.A330, ACType.A350, ACType.B777, ACType.B737, ACType.A32S, ACType.RRJ}),
-                new Resource("Хранение", "B", new List<string>(){"PL09", "PL090"}, new List<ACType>() {ACType.A330, ACType.A350, ACType.B777, ACType.B737, ACType.A32S, ACType.RRJ})
-            };
-            foreach (var resource in listResources)
-            {
-                scheduler.Resources.Add(resource);
-            }
-
-            scheduler.StartDate = dateTimeStartTO;
-            scheduler.Days = (int)dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) + 1;
-
-            var dataTable = CreateDataTableColumns();
-            CreateDataTable(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, typeReports, planVersion, listResources);
-
-            scheduler.DataSource = dataTable;
-
-            //scheduler.DataSource = GetSchedulerData();
-            scheduler.DataBind();
-
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
-
-            using (var htmlWriter = new HtmlTextWriter(sw))
-            {
-                scheduler.RenderControl(htmlWriter);
-                //2 - чтобы влезало
-                ReportWidth = scheduler.GridWidth + scheduler.RowHeaderWidth + 5;
-                //+ подпись
-                ReportHeight = scheduler.GridHeight + 40 + 52/*scheduler.HeaderHeight * 2 + 1*/;
-                ReportRowHeadersWeight = scheduler.RowHeaderWidth;
-                html = sb.ToString();
-            }
-
-            return html;
-        }
-
-        protected string GetWorkPackagePlanReportAT(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion,
-        bool oneHeader = false)
-        {
-            string html = "";
-
-            DayPilotScheduler scheduler = new DayPilotScheduler();
-
-            scheduler.HeaderFontSize = "11px";
-            scheduler.HeaderHeight = 16;
-            scheduler.DataStartField = "start";
-            scheduler.ArrivalField = "arrival";
-            scheduler.ArrivalDifDaysField = "arrivalDifDays";
-            scheduler.DataEndField = "end";
-            scheduler.DepartureField = "departure";
-            scheduler.DepartureDifDaysField = "departureDifDays";
-            scheduler.DataTextField = "name";
-            scheduler.DataValueField = "id";
-            scheduler.DataResourceField = "resource";
-            scheduler.EventFontSize = "10px";
-            scheduler.WPNOIField = "wpnoi";
-            scheduler.WPNOField = "wpno";
-            scheduler.MHRField = "mhr";
-            scheduler.BookedMHRField = "bookedMHR";
-            scheduler.DataResourceNameField = "resourceName";
-            scheduler.ACTypeField = "acType";
-            scheduler.StationNameField = "stationName";
-            //отображение по дням без вертикальных линий по два часа
-            /*scheduler.CellDuration = 1440;
-            scheduler.CellWidth = 120;
-            scheduler.EventHeight = 45;
-            scheduler.RowHeaderWidth = 120;
-            scheduler.TwoHeaders = false;*/
-
-            //отображение по два часа с дополнительным заголовком
-            scheduler.CellDuration = 120;
-            scheduler.CellWidth = 15;
-            scheduler.TimeSpendingHeight = 14;
-            scheduler.HeightBar = 4;
-            scheduler.EventHeight = 50 + scheduler.TimeSpendingHeight;
-
-
-            scheduler.RowHeaderWidth = 90;
-            if (!oneHeader)
-                scheduler.TwoHeaders = true;
-
-
-
-            scheduler.BeforeEventRender += new BeforeEventRenderEventHandler(DayPilotScheduler_BeforeEventRender);
-            scheduler.EventClickHandling = DayPilot.Web.Ui.Enums.EventClickHandlingEnum.JavaScript;
-            scheduler.TimeRangeSelectedHandling = DayPilot.Web.Ui.Enums.TimeRangeSelectedHandling.Disabled;
-
-
-            scheduler.CssOnly = true;
-            scheduler.CssClassPrefix = "scheduler_transparent";
-
-
-            scheduler.TimeFormat = DayPilot.Web.Ui.Enums.TimeFormat.Clock24Hours;
-
-            var listResources = new List<Resource>()
-            {
-                new Resource("Перрон", "A", new List<string>() {"PL08", "PL080"}, new List<ACType>() {ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777} ),
-                new Resource("Ангар", "B", new List<string>(){"PL10", "PL13", "PL100", "PL130"}, new List<ACType>() {ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777} )
-            };
-            foreach (var resource in listResources)
-            {
-                scheduler.Resources.Add(resource);
-            }
-
-            scheduler.StartDate = dateTimeStartTO;
-            scheduler.Days = (int)dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) + 1;
-
-            var dataTable = CreateDataTableColumns();
-            CreateDataTable(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, typeReports, planVersion, listResources);
-
-            scheduler.DataSource = dataTable;
-
-            scheduler.DataBind();
-
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
-
-            using (var htmlWriter = new HtmlTextWriter(sw))
-            {
-                scheduler.RenderControl(htmlWriter);
-                //2 - чтобы влезало
-                ReportWidth = scheduler.GridWidth + scheduler.RowHeaderWidth + 5;
-                //+ подпись
-                ReportHeight = scheduler.GridHeight + 40 + 52/*scheduler.HeaderHeight * 2 + 1*/;
-                ReportRowHeadersWeight = scheduler.RowHeaderWidth;
-                html = sb.ToString();
-            }
-
-            return html;
-        }
-
-
-        protected string GetWorkPackagePlanReportTOOUT(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, 
-            bool oneHeader =false)
-        {
-            string html = "";
-
-            DayPilotScheduler scheduler = new DayPilotScheduler();
-
-            scheduler.HeaderFontSize = "11px";
-            scheduler.HeaderHeight = 16;
-            scheduler.DataStartField = "start";
-            scheduler.ArrivalField = "arrival";
-            scheduler.ArrivalDifDaysField = "arrivalDifDays";
-            scheduler.DataEndField = "end";
-            scheduler.DepartureField = "departure";
-            scheduler.DepartureDifDaysField = "departureDifDays";
-            scheduler.DataTextField = "name";
-            scheduler.DataValueField = "id";
-            scheduler.DataResourceField = "resource";
-            scheduler.EventFontSize = "10px";
-            scheduler.WPNOIField = "wpnoi";
-            scheduler.WPNOField = "wpno";
-            scheduler.MHRField = "mhr";
-            scheduler.BookedMHRField = "bookedMHR";
-            scheduler.DataResourceNameField = "resourceName";
-            scheduler.ACTypeField = "acType";
-            scheduler.StationNameField = "stationName";
-            //отображение по дням без вертикальных линий по два часа
-            /*scheduler.CellDuration = 1440;
-            scheduler.CellWidth = 120;
-            scheduler.EventHeight = 45;
-            scheduler.RowHeaderWidth = 120;
-            scheduler.TwoHeaders = false;*/
-
-            //отображение по два часа с дополнительным заголовком
-            scheduler.CellDuration = 120;
-            scheduler.CellWidth = 15;
-            scheduler.TimeSpendingHeight = 14;
-            scheduler.HeightBar = 4;
-            scheduler.EventHeight = 50 + scheduler.TimeSpendingHeight;
-
-
-            scheduler.RowHeaderWidth = 90;
-            if (!oneHeader)
-                scheduler.TwoHeaders = true;
-
-
-
-            scheduler.BeforeEventRender += new BeforeEventRenderEventHandler(DayPilotScheduler_BeforeEventRender);
-            scheduler.EventClickHandling = DayPilot.Web.Ui.Enums.EventClickHandlingEnum.JavaScript;
-            scheduler.TimeRangeSelectedHandling = DayPilot.Web.Ui.Enums.TimeRangeSelectedHandling.Disabled;
-
-
-            scheduler.CssOnly = true;
-            scheduler.CssClassPrefix = "scheduler_transparent";
-
-
-            scheduler.TimeFormat = DayPilot.Web.Ui.Enums.TimeFormat.Clock24Hours;
-
-
-            var listResources = new List<Resource>()
-            {
-                new Resource("TO OUT", "A", new List<string>(){"PL05", "PL050"}, new List<ACType>() {ACType.B777, ACType.A330, ACType.B737, ACType.A32S, ACType.RRJ})
-            };
-            foreach (var resource in listResources)
-            {
-                scheduler.Resources.Add(resource);
-            }
-            
-            scheduler.StartDate = dateTimeStartTO;
-            //scheduler.Days = 5;// DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
-            scheduler.Days = (int)dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) + 1;
-
-            var dataTable = CreateDataTableColumns();
-            CreateDataTable(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, typeReports, planVersion, listResources);
-
-            scheduler.DataSource = dataTable;
-
-            //scheduler.DataSource = GetSchedulerData();
-            scheduler.DataBind();
-
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
-
-            using (var htmlWriter = new HtmlTextWriter(sw))
-            {
-                scheduler.RenderControl(htmlWriter);
-                //2 - чтобы влезало
-                ReportWidth = scheduler.GridWidth + scheduler.RowHeaderWidth + 5;
-                //+ подпись
-                ReportHeight = scheduler.GridHeight + 40 + 52/*scheduler.HeaderHeight * 2 + 1*/;
-                html = sb.ToString();
-            }
-
-            return html;
-        }
-
-        protected string GetWorkPackagePlanReportWOUT(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, bool oneHeader = false)
-        {
-            string html = "";
-
-            DayPilotScheduler scheduler = new DayPilotScheduler();
-
-            scheduler.HeaderFontSize = "11px";
-            scheduler.HeaderHeight = 16;
-            scheduler.DataStartField = "start";
-            scheduler.ArrivalField = "arrival";
-            scheduler.ArrivalDifDaysField = "arrivalDifDays";
-            scheduler.DataEndField = "end";
-            scheduler.DepartureField = "departure";
-            scheduler.DepartureDifDaysField = "departureDifDays";
-            scheduler.DataTextField = "name";
-            scheduler.DataValueField = "id";
-            scheduler.DataResourceField = "resource";
-            scheduler.EventFontSize = "10px";
-            scheduler.WPNOIField = "wpnoi";
-            scheduler.WPNOField = "wpno";
-            scheduler.MHRField = "mhr";
-            scheduler.DataResourceNameField = "resourceName";
-            scheduler.ACTypeField = "acType";
-            //отображение по дням без вертикальных линий по два часа
-            /*scheduler.CellDuration = 1440;
-            scheduler.CellWidth = 120;
-            scheduler.EventHeight = 45;
-            scheduler.RowHeaderWidth = 120;
-            scheduler.TwoHeaders = false;*/
-
-            //отображение по два часа с дополнительным заголовком
-            scheduler.CellDuration = 120;
-            scheduler.CellWidth = 15;
-            scheduler.TimeSpendingHeight = 14;
-            scheduler.HeightBar = 4;
-            scheduler.EventHeight = 50 + scheduler.TimeSpendingHeight;
-
-
-            scheduler.RowHeaderWidth = 90;
-            if (!oneHeader)
-                scheduler.TwoHeaders = true;
-
-
-
-            scheduler.BeforeEventRender += new BeforeEventRenderEventHandler(DayPilotScheduler_BeforeEventRender);
-            scheduler.EventClickHandling = DayPilot.Web.Ui.Enums.EventClickHandlingEnum.JavaScript;
-            scheduler.TimeRangeSelectedHandling = DayPilot.Web.Ui.Enums.TimeRangeSelectedHandling.Disabled;
-
-
-            scheduler.CssOnly = true;
-            scheduler.CssClassPrefix = "scheduler_transparent";
-
-
-            scheduler.TimeFormat = DayPilot.Web.Ui.Enums.TimeFormat.Clock24Hours;
-
-            scheduler.Resources.Add(new Resource("Weekly OUT", "A"));
-
-            scheduler.StartDate = dateTimeStartTO;
-            //scheduler.Days = 5;// DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month);
-            scheduler.Days = (int)dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) + 1;
-
-            var dataTable = CreateDataTableColumns();
-            CreateWOUT(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, typeReports, planVersion);
-
-            scheduler.DataSource = dataTable;
-
-            //scheduler.DataSource = GetSchedulerData();
-            scheduler.DataBind();
-
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
-
-            using (var htmlWriter = new HtmlTextWriter(sw))
-            {
-                scheduler.RenderControl(htmlWriter);
-                html = sb.ToString();
-            }
-
-            return html;
-        }
-
-        protected string GetWorkPackageReportOTO(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, bool oneHeader = false)
-        {
-            string html = "";
-
-            DayPilotScheduler scheduler = new DayPilotScheduler();
-
-            scheduler.HeaderFontSize = "11px";
-            scheduler.HeaderHeight = 16;
-            scheduler.DataStartField = "start";
-            scheduler.ArrivalField = "arrival";
-            scheduler.ArrivalDifDaysField = "arrivalDifDays";
-            scheduler.DataEndField = "end";
-            scheduler.DepartureField = "departure";
-            scheduler.DepartureDifDaysField = "departureDifDays";
-            scheduler.DataTextField = "name";
-            scheduler.DataValueField = "id";
-            scheduler.DataResourceField = "resource";
-            scheduler.EventFontSize = "10px";
-            scheduler.WPNOIField = "wpnoi";
-            scheduler.WPNOField = "wpno";
-            scheduler.MHRField = "mhr";
-            scheduler.BookedMHRField = "bookedMHR";
-            scheduler.DataResourceNameField = "resourceName";
-            scheduler.ACTypeField = "acType";
-            scheduler.StationNameField = "stationName";
-            //отображение по дням без вертикальных линий по два часа
-            /*scheduler.CellDuration = 1440;
-            scheduler.CellWidth = 120;
-            scheduler.EventHeight = 45;
-            scheduler.RowHeaderWidth = 120;
-            scheduler.TwoHeaders = false;*/
-
-            //отображение по два часа с дополнительным заголовком
-            scheduler.CellDuration = 120;
-            scheduler.CellWidth = 15;
-            scheduler.TimeSpendingHeight = 14;
-            scheduler.HeightBar = 4;
-            scheduler.EventHeight = 50 + scheduler.TimeSpendingHeight;
-            
-            scheduler.RowHeaderWidth = 90;
-            if (!oneHeader)
-                scheduler.TwoHeaders = true;
-
-
-            scheduler.BeforeEventRender += new BeforeEventRenderEventHandler(DayPilotScheduler_BeforeEventRender);
-            scheduler.EventClickHandling = DayPilot.Web.Ui.Enums.EventClickHandlingEnum.JavaScript;
-            scheduler.TimeRangeSelectedHandling = DayPilot.Web.Ui.Enums.TimeRangeSelectedHandling.Disabled;
-
-
-            scheduler.CssOnly = true;
-            scheduler.CssClassPrefix = "scheduler_transparent";
-
-
-            scheduler.TimeFormat = DayPilot.Web.Ui.Enums.TimeFormat.Clock24Hours;
-
-            var listResources = new List<Resource>()
-            {
-                new Resource("Ангар", "A", new List<string>(){"PL06", "PL110"}, new List<ACType>() {ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777} ),
-                new Resource("Оперативное ТО", "B", new List<string>(){"PL01", "PL010"}, new List<ACType>() {ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
-                new Resource("Outsource/<br/>Внебазовое ТО", "D", new List<string>(){"PL04", "PL040"},new List<ACType>() {ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777} )
-            };
-            foreach (var resource in listResources)
-            {
-                scheduler.Resources.Add(resource);
-            }
-
-            
-
-            scheduler.StartDate = dateTimeStartTO;
-            scheduler.Days = (int)dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) + 1;
-
-            var dataTable = CreateDataTableColumns();
-            CreateDataTable(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, typeReports, planVersion, listResources);
-
-            scheduler.DataSource = dataTable;
-            scheduler.DataBind();
-
-            var sb = new StringBuilder();
-            var sw = new StringWriter(sb);
-            
-
-
-            using (var htmlWriter = new HtmlTextWriter(sw))
-            {
-                scheduler.RenderControl(htmlWriter);
-                //2 - чтобы влезало
-                ReportWidth = scheduler.GridWidth + scheduler.RowHeaderWidth + 5;
-                //+ подпись
-                ReportHeight = scheduler.GridHeight + 40 + 52/*scheduler.HeaderHeight * 2 + 1*/;
-                ReportRowHeadersWeight = scheduler.RowHeaderWidth;
-                html = sb.ToString();
-            }
-
-            return html;
-        }
-
-
-        protected string GetWorkPackagePlanReportPTO(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, bool oneHeader = false)
-        {
-            string html = "";
-
-            DayPilotScheduler scheduler = new DayPilotScheduler();
-
-            scheduler.HeaderFontSize = "11px";
-            scheduler.HeaderHeight = 16;
-            scheduler.DataStartField = "start";
-            scheduler.ArrivalField = "arrival";
-            scheduler.ArrivalDifDaysField = "arrivalDifDays";
-            scheduler.DataEndField = "end";
-            scheduler.DepartureField = "departure";
-            scheduler.DepartureDifDaysField = "departureDifDays";
+            //scheduler.DepartureDifDaysField = "departureDifDays";
             scheduler.DataTextField = "name";
             scheduler.DataValueField = "id";
             scheduler.DataResourceField = "resource";
@@ -655,8 +182,8 @@ namespace WebApp.Controllers
 
             var listResources = new List<Resource>()
             {
-                new Resource("C-ch", "A", new List<string>{"PL03", "PL30"}, new List<ACType>{ ACType.RRJ,ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
-                new Resource("ПТО силами А-Т", "B", new List<string> { "PL10", "PL100" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
+                new Resource("Дом", "A", new List<string>{"PL03", "PL30"}, new List<ACType>{ ACType.RRJ,ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
+                new Resource("Работа", "B", new List<string> { "PL10", "PL100" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
                 new Resource("ОТО ангар", "C", new List<string> { "PL06", "PL060" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
                 new Resource("A-ch, AOG", "D", new List<string> { "PL02", "PL020", "PL012", "PL0120" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ }),
                 new Resource("Мойки ВС", "E", new List<string> { "PL11", "PL110" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ })
@@ -687,7 +214,7 @@ namespace WebApp.Controllers
                 //2 - чтобы влезало
                 ReportWidth = scheduler.GridWidth + scheduler.RowHeaderWidth + 5;
                 //+ подпись
-                ReportHeight = scheduler.GridHeight + 40 + 52/*scheduler.HeaderHeight * 2 + 1*/;
+                ReportHeight = scheduler.GridHeight + 40 + 52;
                 ReportRowHeadersWeight = scheduler.RowHeaderWidth;
                 html = sb.ToString();
             }
@@ -741,27 +268,11 @@ namespace WebApp.Controllers
             switch (tab)
             {
                 case Tab.PTO:
-                    tabHtmlString = GetWorkPackagePlanReportPTO(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
+                    tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
                     signature = placeSignaturePTO;
                     break;
-                case Tab.OTO:
-                    tabHtmlString = GetWorkPackageReportOTO(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
-                    signature = placeSignatureOTO;
-                    break;
-                //case Tab.W_OUT:
-                //    tabHtmlString = GetWorkPackagePlanReportWOUT(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion);
-                //    break;
-                case Tab.TO_OUT:
-                    tabHtmlString = GetWorkPackagePlanReportTOOUT(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
-                    break;
-                case Tab.A_T:
-                    tabHtmlString = GetWorkPackagePlanReportAT(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
-                    break;
-                case Tab.WDTM:
-                    tabHtmlString = GetWorkPackagePlanReportWDTM(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
-                    break;
                 default:
-                    tabHtmlString = GetWorkPackagePlanReportPTO(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
+                    tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
                     break;
             }
 
@@ -892,133 +403,6 @@ namespace WebApp.Controllers
             return binData;
         }
 
-        protected (DataRow dr, int counter) CreateRowByPL(DataTable dt, DataRow dr, DateTime start, DateTime dateTimeStartTO, 
-            DateTime dateTimeEndTO, string pl, int day, int counter, string resource, ACType acType, TypeReport typeReports, int planVersion)
-        {
-            if (typeReports == TypeReport.Plan)
-            {
-                var entriesPlanPL = _wpPlanRepository.GetPlanByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType);
-                foreach (var entryPL in entriesPlanPL)
-                {
-                    dr = dt.NewRow();
-                    dr["id"] = counter;
-                    //var differenceBetweenTwoStartDates = entryPL.PL_START_DATE.DifferenceBetweenTwoDatesAbs(dateTimeStartTO);
-                    var differenceBetweenTwoStartDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.PL_START_DATE);
-                    var differenceBetweenTwoStartDatesInHours = entryPL.PL_START_DATE.Date.DifferenceBetweenTwoDatesInHours(entryPL.PL_START_DATE);
-                    if (differenceBetweenTwoStartDates >= 0 && differenceBetweenTwoStartDatesInHours >= 0)
-                    {
-                        dr["start"] = start.AddDays(differenceBetweenTwoStartDates).AddHours(differenceBetweenTwoStartDatesInHours);
-                        dr["arrival"] = entryPL.Arrival;
-                    }
-                    else
-                    {
-                        dr["start"] = entryPL.PL_START_DATE;
-                        dr["arrival"] = entryPL.Arrival;
-                    }
-                    //var differenceBetweenTwoEndDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.PL_END_DATE);
-                    var differenceBetweenTwoEndDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.PL_END_DATE);
-                    var differenceBetweenTwoEndDatesInHours = entryPL.PL_END_DATE.Date.DifferenceBetweenTwoDatesInHours(entryPL.PL_END_DATE);
-                    if (differenceBetweenTwoEndDates >= 0 && differenceBetweenTwoEndDatesInHours >= 0)
-                    {
-                        dr["end"] = start.AddDays(differenceBetweenTwoEndDates).AddHours(differenceBetweenTwoEndDatesInHours);
-                        dr["departure"] = entryPL.Departure;
-                    }
-                    else
-                    {
-                        dr["end"] = entryPL.PL_END_DATE;
-                        dr["departure"] = entryPL.Departure;
-                    }
-
-                    var mhrPlan = entryPL.MHR != 0 ? $" - {entryPL.MHR} MH" : "";
-                    var readiness = entryPL.CONTAINS_C_CHECK ? $"<br/>(готовность {entryPL.PL_END_DATE.ToShortDateString()})" : "";
-                    var remarks = !string.IsNullOrEmpty(entryPL.INTERNAL_REMARKS) ? entryPL.INTERNAL_REMARKS + "<br/>" : "";
-                    var name = $"{remarks}{entryPL.AC_TYP} {entryPL.AC_REGISTR} {entryPL.Description}{mhrPlan} {readiness}";
-                    dr["name"] = name;
-                    dr["resource"] = resource;
-                    dr["color"] = entryPL.HEXColorACType;
-                    dr["wpnoi"] = entryPL.WPNO_I;
-                    dr["wpno"] = entryPL.WPNO;
-                    dr["mhr"] = entryPL.MHR;
-                    dr["arrivalDifDays"] = entryPL.ArrivalDifDays;
-                    dr["departureDifDays"] = entryPL.DepartureDifDays;
-                    dt.Rows.Add(dr);
-                    counter++;
-                }
-            }
-            else
-            {
-                var entriesFactPL = _wpPlanRepository.GetFactByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType);
-                foreach (var entryPL in entriesFactPL)
-                {
-                    dr = dt.NewRow();
-                    dr["id"] = counter;
-                    var startDate = entryPL.ACT_START_DATE;
-                    var endDate = entryPL.ACT_END_DATE;
-
-                    if (entryPL.ACT_START_DATE == DateTime.MinValue)
-                    {
-                        startDate = entryPL.PL_START_DATE;
-                    }
-
-                    if (entryPL.ACT_END_DATE == DateTime.MinValue)
-                    {
-                        endDate = entryPL.PL_END_DATE;
-                    }
-
-                    var differenceBetweenTwoStartDates = dateTimeStartTO.DifferenceBetweenTwoDates(startDate);
-                    var differenceBetweenTwoStartDatesInHours = startDate.Date.DifferenceBetweenTwoDatesInHours(startDate);
-                    if (differenceBetweenTwoStartDates >= 0 && differenceBetweenTwoStartDatesInHours >= 0)
-                    {
-                        dr["start"] = start.AddDays(differenceBetweenTwoStartDates).AddHours(differenceBetweenTwoStartDatesInHours);
-                        dr["arrival"] = entryPL.Arrival;
-                    }
-                    else
-                    {
-                        dr["start"] = startDate;
-                        dr["arrival"] = entryPL.Arrival;
-                    }
-                    var differenceBetweenTwoEndDates = dateTimeStartTO.DifferenceBetweenTwoDates(endDate);
-                    var differenceBetweenTwoEndDatesInHours = endDate.Date.DifferenceBetweenTwoDatesInHours(endDate);
-                    if (differenceBetweenTwoEndDates >= 0 && differenceBetweenTwoEndDatesInHours >= 0)
-                    {
-                        dr["end"] = start.AddDays(differenceBetweenTwoEndDates).AddHours(differenceBetweenTwoEndDatesInHours);
-                        dr["departure"] = entryPL.Departure;
-                    }
-                    else
-                    {
-                        dr["end"] = endDate;
-                        dr["departure"] = entryPL.Departure;
-                    }
-                    var mhrFact = entryPL.BOOKED_MHR != 0 ? $" - {entryPL.BOOKED_MHR} MH" : "";
-                    var readiness = entryPL.CONTAINS_C_CHECK ? $"<br/>(готовность {endDate.ToShortDateString()})" : "";
-                    var remarks = !string.IsNullOrEmpty(entryPL.INTERNAL_REMARKS) ? entryPL.INTERNAL_REMARKS + "<br/>" : "<br/>";
-                    var name = $"{remarks}{entryPL.AC_TYP} {entryPL.AC_REGISTR} {entryPL.Description}{mhrFact} {readiness}";
-                    dr["name"] = name;
-                    dr["resource"] = resource;
-                    dr["color"] = entryPL.HEXColorACType;
-                    dr["wpnoi"] = entryPL.WPNO_I;
-                    dr["wpno"] = entryPL.WPNO;
-                    dr["mhr"] = entryPL.BOOKED_MHR;
-                    dr["arrivalDifDays"] = entryPL.ArrivalDifDays;
-                    dr["departureDifDays"] = entryPL.DepartureDifDays;
-                    dt.Rows.Add(dr);
-                    counter++;
-                }
-            }
-            
-            return (dr, counter);
-        }
-
-        protected void CreateWOUT(DateTime start, DateTime dateTimeStartTO, DateTime dateTimeEndTO, DataRow dr, DataTable dt, int day, ACType acType,
-            TypeReport typeReport, int planVersion)
-        {
-            var counter = 0;
-            var createPL04 = CreateRowByPL(dt, dr, start, dateTimeStartTO, dateTimeEndTO, "PL04", day, counter, "A", acType, typeReport, planVersion);
-            counter = createPL04.counter;
-            dr = createPL04.dr;
-            CreateRowByPL(dt, dr, start, dateTimeStartTO, dateTimeEndTO, "PL040", day, counter, "A", acType, typeReport, planVersion);
-        }
-
         //Поубирать лишние параметры
         protected (DataRow dr, int counter) CreateRowByPL(DataTable dt, DataRow dr, DateTime start, DateTime dateTimeStartTO,
             DateTime dateTimeEndTO, int counter, string resource, string resourceName, ACType acType, TypeReport typeReports, List<WPPlanDAO> entriesPL)
@@ -1053,20 +437,13 @@ namespace WebApp.Controllers
                         dr["end"] = entryPL.PL_END_DATE;
                         dr["departure"] = entryPL.Departure;
                     }
-
-                    var mhrPlan = entryPL.MHR != 0 ? $" - {entryPL.MHR} MH" : "";
-                    var readiness = entryPL.CONTAINS_C_CHECK ? $"<br/>(готовность {entryPL.PL_END_DATE.ToShortDateString()})" : "";
-                    var remarks = !string.IsNullOrEmpty(entryPL.INTERNAL_REMARKS) ? entryPL.INTERNAL_REMARKS + "<br/>" : "";
-                    var name = $"{remarks}{entryPL.AC_MODEL} {entryPL.AC_REGISTR} {entryPL.Description}{mhrPlan} {readiness}";
-                    dr["name"] = name;
+                    dr["name"] = entryPL.Description;
                     dr["resource"] = resource;
                     dr["color"] = entryPL.HEXColorACType;
                     dr["wpnoi"] = entryPL.WPNO_I;
                     dr["wpno"] = entryPL.WPNO;
                     dr["mhr"] = entryPL.MHR;
                     dr["bookedMHR"] = entryPL.BOOKED_MHR;
-                    dr["arrivalDifDays"] = entryPL.ArrivalDifDays;
-                    dr["departureDifDays"] = entryPL.DepartureDifDays;
                     dr["resourceName"] = resourceName;
                     dr["acType"] = entryPL.AC_TYP;
                     dr["stationName"] = entryPL.STATION_NAME;
@@ -1128,8 +505,6 @@ namespace WebApp.Controllers
                     dr["wpno"] = entryPL.WPNO;
                     dr["mhr"] = entryPL.BOOKED_MHR;
                     dr["bookedMHR"] = entryPL.BOOKED_MHR;
-                    dr["arrivalDifDays"] = entryPL.ArrivalDifDays;
-                    dr["departureDifDays"] = entryPL.DepartureDifDays;
                     dr["resourceName"] = resourceName;
                     dr["acType"] = entryPL.AC_TYP;
                     dr["stationName"] = entryPL.STATION_NAME;
@@ -1185,10 +560,8 @@ namespace WebApp.Controllers
             DataTable dt = new DataTable();
             dt.Columns.Add("start", typeof(DateTime));
             dt.Columns.Add("arrival", typeof(DateTime));
-            dt.Columns.Add("arrivalDifDays", typeof(string));
             dt.Columns.Add("end", typeof(DateTime));
             dt.Columns.Add("departure", typeof(DateTime));
-            dt.Columns.Add("departureDifDays", typeof(string));
             dt.Columns.Add("name", typeof(string));
             dt.Columns.Add("id", typeof(string));
             dt.Columns.Add("resource", typeof(string));
