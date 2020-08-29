@@ -1,0 +1,408 @@
+﻿@using Core.Model
+
+@{
+    ViewBag.Title = "Отчет по планированию ТО ВС";
+}
+
+<h4>Планирование ТО ВС</h4>
+
+<div class="row">
+    <div class="col-md-12">
+        <span class="btn btn-default" data-toggle="collapse" data-target="#filter">
+            <span class="glyphicon  glyphicon-filter"></span>Параметры представления
+        </span>
+
+        @using (Html.BeginForm("WorkPackagePlanReport", "Reports", FormMethod.Get))
+        {
+            <div id="filter" class="collapse in">
+                <div class="form-horizontal">
+                    <br />
+                    <div class="form-group report-param-box">
+                        <label class="control-label col-md-2" style="white-space: nowrap">Период: </label>
+                        <div class="col-md-4">
+                            @Html.TextBox("dateStartTO", (string)ViewBag.DateStartTO, new { @class = "form-control", type = "date" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.TextBox("dateEndTO", (string)ViewBag.DateEndTO, new { @class = "form-control", type = "date" })
+                        </div>
+                    </div>
+                    <div class="form-group report-param-box">
+                        <label class="control-label col-md-2" style="white-space: nowrap">Типы ВС: </label>
+                        <div class="col-md-4">
+                            @Html.DropDownList("acType", ViewBag.ArrayBC as SelectList, htmlAttributes: new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group report-param-box">
+                        <label class="control-label col-md-2" style="white-space: nowrap">Тип плана: </label>
+                        <div class="col-md-4">
+                            @Html.DropDownList("typeReport", ViewBag.TypeReports as SelectList, htmlAttributes: new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group report-param-box">
+                        <div class="col-md-10">
+                            <input id="createPlan" name="createPlan" type="hidden" value="true" />
+                            <input type="submit" class="btn btn-default" value="Показать отчет" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<br />
+
+@if (ViewBag.PlanVersion != null)
+{
+    <div class="modal fade" id="eventDetailsModal" tabindex="-1" role="dialog" aria-labelledby="eventDetails">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="eventDetails">Подробности</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <label class="col-md-2">WPNO: </label>
+                        <a href="" class="col-md-10" id="wpno"></a>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2">Описание: </label>
+                        <div class="col-md-10" id="description"></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2">Начало: </label>
+                        <div class="col-md-4" id="startDate"></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2">Окончание: </label>
+                        <div class="col-md-4" id="endDate"></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2">MHR: </label>
+                        <div class="col-md-4" id="mhr"></div>
+                        <label class="col-md-2">Booked MHR: </label>
+                        <div class="col-md-4" id="bookedMHR"></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-2">Прилет: </label>
+                        <div class="col-md-4" id="arrival"></div>
+                        <label class="col-md-2">Вылет: </label>
+                        <div class="col-md-4" id="departure"></div>
+                    </div>
+                    <div class="row">
+                        <label class="col-md-3">Станция ТО: </label>
+                        <div class="col-md-4" id="stationName"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    using (Html.BeginForm("SavePlan", "Reports", FormMethod.Post, new { @class = "savePlanForm" }))
+    {
+        <div class="row">
+        <div class="col-md-12">
+            <div class="form-horizontal">
+
+                <div class="form-group report-param-box">
+                    <div class="col-md-10">
+                        <span>Версия плана: @ViewBag.PlanVersion</span>
+                    </div>
+                </div>
+
+                <div class="form-group report-param-box">
+                    <div class="col-md-10">
+                        <input class="btn btn-default" name="draft" type="submit" id="Draft" value="Черновик" />
+                        <input class="btn btn-default" name="approve" type="submit" id="Approve" value="Зафиксировать ИВП" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+        <br />
+    }
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active">
+                    <a href="#PTO" aria-controls="PTO" role="tab" data-toggle="tab">ПТО</a>
+                </li>
+                <li role="presentation">
+                    <a href="#OTO" aria-controls="OTO" role="tab" data-toggle="tab">OTO</a>
+                </li>
+                <li role="presentation">
+                    <a href="#TOOUT" aria-controls="TOOUT" role="tab" data-toggle="tab">TO OUT</a>
+                </li>
+                <li role="presentation">
+                    <a href="#AT" aria-controls="AT" role="tab" data-toggle="tab">A-T</a>
+                </li>
+                <li role="presentation">
+                    <a href="#WDTM" aria-controls="WDTM" role="tab" data-toggle="tab">Стоянка/Хранение ВС</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="PTO">
+                    <div style="">
+                        @Html.Raw(ViewBag.WorkPackagePlanReportPTO)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
+                                                                                new {tab = Tab.PTO, dateStart = ViewBag.DateStartTO,
+                                                                                    dateEnd = ViewBag.DateEndTO,
+                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="OTO">
+                    <div style="">
+                        @Html.Raw(ViewBag.WorkPackagePlanReportOTO)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
+                                                                                new {tab = Tab.OTO, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
+                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
+                        </div>
+                    </div>
+                </div>
+                @*<div role="tabpanel" class="tab-pane" id="WOUT">
+                    <div style="">
+                        @Html.Raw(ViewBag.WorkPackagePlanReportWOUT)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
+                                                                                new {tab = Tab.W_OUT, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
+                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
+                        </div>
+                    </div>
+                </div>*@
+                <div role="tabpanel" class="tab-pane" id="TOOUT">
+                    <div style="">
+                        @Html.Raw(ViewBag.WorkPackagePlanReportTOOUT)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
+                                                                                new {tab = Tab.TO_OUT, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
+                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="AT">
+                    <div style="">
+                        @Html.Raw(ViewBag.WorkPackagePlanReportAT)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
+                                                                                new {tab = Tab.A_T, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
+                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
+                        </div>
+                    </div>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="WDTM">
+                    <div style="">
+                        @Html.Raw(ViewBag.WorkPackagePlanReportWDTM)
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            &nbsp;
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
+                                                                                new {tab = Tab.WDTM, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
+                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $('#eventDetailsModal').on('show.bs.modal', function(event) {
+            var div = $(event.relatedTarget);
+            var modal = $(this);
+            var wpno = div.data('wpno');
+            modal.find('#wpno').attr("href", hrefWpnoi).text(wpno);
+            modal.find('#description').text(div.data('description'));
+            modal.find('#startDate').text(div.data('startdate'));
+            modal.find('#arrival').text(div.data('arrival'));
+            modal.find('#endDate').text(div.data('enddate'));
+            modal.find('#departure').text(div.data('departure'));
+            modal.find('#columnNumber').text(div.data('columnnumber'));
+            modal.find('#height').text(div.data('height'));
+            modal.find('#mhr').text(div.data('mhr'));
+            modal.find('#bookedMHR').text(div.data('bookedmhr'));
+            modal.find('#stationName').text(div.data('stationname'));
+
+        });
+    });
+
+
+    @if (ViewBag.CreatePlan == true)
+    {
+        <text>
+            $(".savePlanForm").submit(
+                function (e) {
+                    e.preventDefault();
+                    event.stopImmediatePropagation();
+                    var action = $(".savePlanForm").attr("action");
+                    var submit = $(document.activeElement).attr('id');
+                    $.ajax({
+                        type: "POST",
+                        url: action + "?submit=" + submit + "&planVersion=@ViewBag.PlanVersion&user=@User.Identity.Name.Split('\\')[1]" ,
+                        //data: submit,
+                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                        dataType: "json",
+                        success: function (response) {
+                            console.log(response);
+                            if (response.success) {
+                                alert(response.success);
+                            } else {
+                                alert(response.error);
+                            }
+                        },
+                        error: function (response) {
+                            alert(response.error);
+                        }
+                    });
+                }
+            );
+        </text>
+    }
+
+
+    $(function () {
+        if (true || !Modernizr.inputtypes.date) {
+            $(function () {
+                var datePickers = $("input[type='date']").datepicker();
+                $.each(datePickers, function () {
+                    var datePicker = $(this);
+                    if (datePicker != null
+                        && typeof (datePicker) != 'udefined'
+                        && datePicker.get(0) != null
+                        && typeof (datePicker.get(0)) != 'udefined') {
+                        var dateValue = datePicker.get(0).getAttribute("value");
+                        datePicker.get(0).setAttribute("type", "text");
+                        if (dateValue != null) {
+                            datePicker.get(0).setAttribute("value", dateValue);
+                        }
+                    }
+                });
+
+                var dateTimePickers = $("input[type='datetime']").datetimepicker();
+                $.each(dateTimePickers, function () {
+                    var dateTimePicker = $(this);
+                    if (dateTimePicker != null
+                        && typeof (dateTimePicker) != 'udefined'
+                        && dateTimePicker.get(0) != null
+                        && typeof (dateTimePicker.get(0)) != 'udefined') {
+                        var dateTimeValue = dateTimePicker.get(0).getAttribute("value");
+                        dateTimePicker.get(0).setAttribute("type", "text");
+                        if (dateTimeValue != null) {
+                            dateTimePicker.get(0).setAttribute("value", dateTimeValue);
+                        }
+                    }
+                });
+            });
+            $.datepicker.regional['ru'] = {
+                closeText: 'Закрыть',
+                prevText: 'Пред',
+                nextText: 'След',
+                currentText: 'Сегодня',
+                monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+                    'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+                monthNamesShort: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн',
+                    'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+                dayNames: ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'],
+                dayNamesShort: ['вск', 'пнд', 'втр', 'срд', 'чтв', 'птн', 'сбт'],
+                dayNamesMin: ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'],
+                weekHeader: 'Не',
+                dateFormat: 'dd.mm.yy',
+                firstDay: 1,
+                isRTL: false,
+                showMonthAfterYear: false,
+                yearSuffix: '',
+            };
+            $.datepicker.setDefaults($.datepicker.regional['ru']);
+            $.datepicker.format = 'dd.mm.yy';
+
+            $.timepicker.regional['ru'] = {
+                timeOnlyTitle: 'Выберите время',
+                timeText: 'Время',
+                hourText: 'Часы',
+                minuteText: 'Минуты',
+                secondText: 'Секунды',
+                millisecText: 'Миллисекунды',
+                timezoneText: 'Часовой пояс',
+                currentText: 'Сейчас',
+                closeText: 'Закрыть',
+                timeFormat: 'HH:mm',
+                amNames: ['AM', 'A'],
+                pmNames: ['PM', 'P'],
+                isRTL: false,
+                controlType: 'select',
+                timeFormat: 'HH:mm:ss',
+                oneLine: true
+            };
+            $.timepicker.setDefaults($.timepicker.regional['ru']);
+
+        }
+    });
+
+</script>
+
+
+
+
