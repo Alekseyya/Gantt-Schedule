@@ -91,12 +91,12 @@ namespace DayPilot.Web.Ui
             stripAndAddEvent(e.Start, e.End,
                 e.Arrival, e.Departure,
                 e.Id, e.Text, e.WPNOI, e.WPNO,
-                e.MHR, e.BookedMHR, e.Resource, e.ResourceName, e.ACType, e.Source,  e.StationName);
+                e.MHR, e.BookedMHR, e.Resource, e.ResourceName, e.ACType, e.WorkType, e.Source,  e.StationName);
         }
 
         private void stripAndAddEvent(DateTime start, DateTime end, DateTime arrived, DateTime departure, string pk, string name,
             Int64 wpnoi, string wpno, string mhr, string bookedMHR, string resource, string resourceName,
-            ACType acType, object source, string stationName)
+            ACType acType, WorkType workType, object source, string stationName)
         {
             if (!String.IsNullOrEmpty(Value)) // this applies to resources view only
             {
@@ -127,7 +127,7 @@ namespace DayPilot.Web.Ui
             //    end = End;
 
 
-            events.Add(new Event(pk, Start, End, start, end, arrived, departure, name, resource, resourceName, acType, source, fontSize,
+            events.Add(new Event(pk, Start, End, start, end, arrived, departure, name, resource, resourceName, acType, workType, source, fontSize,
                 cellWidth, cellDuration, wpnoi, wpno, mhr, bookedMHR, stationName));
         }
 
@@ -163,7 +163,7 @@ namespace DayPilot.Web.Ui
         /// Loads events from ArrayList of Events.
         /// </summary>
         /// <param name="events">ArrayList that contains the Events.</param>
-        public void Load(ArrayList events)
+        public void Load(List<Event> events)
         {
             if (events == null)
             {

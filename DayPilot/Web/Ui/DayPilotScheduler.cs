@@ -71,6 +71,7 @@ namespace DayPilot.Web.Ui
         private string _dataResourceField;
         private string _dataResourceNameField;
         private string _acTypeField;
+        private string _workTypeField;
         private string _wpnoiField;
         private string _wpnoField;
         private string _mhrField;
@@ -1749,7 +1750,7 @@ namespace DayPilot.Web.Ui
         private void LoadEventsToDays()
         {
             _days = new List<Day>();
-            ArrayList items = (ArrayList)ViewState["Items"];
+            List<Event> items = (List<Event>)ViewState["Items"];
 
             if (Resources == null)
             {
@@ -2286,6 +2287,27 @@ namespace DayPilot.Web.Ui
             set
             {
                 _acTypeField = value;
+
+                if (Initialized)
+                {
+                    OnDataPropertyChanged();
+                }
+
+            }
+        }
+
+
+        [Category("Data")]
+        [Description("Название ресурса")]
+        public string WorkTypeField
+        {
+            get
+            {
+                return _workTypeField;
+            }
+            set
+            {
+                _workTypeField = value;
 
                 if (Initialized)
                 {
@@ -3073,7 +3095,7 @@ namespace DayPilot.Web.Ui
         ///<param name="retrievedData">The <see cref="T:System.Collections.IEnumerable"></see> list of data returned from a <see cref="M:System.Web.UI.WebControls.DataBoundControl.PerformSelect"></see> method call.</param>
         protected override void PerformDataBinding(IEnumerable retrievedData)
         {
-            ViewState["Items"] = new ArrayList();
+            ViewState["Items"] = new List<Event>();
 
             // don't load events in design mode
             if (DesignMode)
@@ -3147,7 +3169,7 @@ namespace DayPilot.Web.Ui
                     else
                         throw new FormatException(String.Format("Unable to convert '{0}' (from WPNO column) to INT.", wpnoiString));
                 }
-
+                
                 var wpno = string.Empty;
                 if (!string.IsNullOrEmpty(WPNOField) && WPNOField != null)
                     wpno = DataBinder.GetPropertyValue(dataItem, WPNOField, null);
@@ -3165,6 +3187,8 @@ namespace DayPilot.Web.Ui
                 {
                     throw new FormatException(String.Format("Unable to convert '{0}' (from DataEndField column) to DateTime.", strEnd));
                 }
+
+
 
                 var arrival = DataBinder.GetPropertyValue(dataItem, ArrivalField, null);
                 if (!DateTime.TryParse(arrival, out DateTime arrivalDateTime))
@@ -3188,6 +3212,13 @@ namespace DayPilot.Web.Ui
                     throw new FormatException(String.Format("Unable to convert '{0}' (from ACTypeField column) to ACType.", acTypeString));
                 }
 
+                var workTypeString = DataBinder.GetPropertyValue(dataItem, WorkTypeField, null);
+                if (!Enum.TryParse(workTypeString, out WorkType workType))
+                {
+                    workType = WorkType.Optional;
+                    //throw new FormatException(String.Format("Unable to convert '{0}' (from WorkTypeField column) to WorkType.", workTypeString));
+                }
+
                 string resourceId = null;
                 if (ViewType == ViewTypeEnum.Resources)
                 {
@@ -3198,8 +3229,8 @@ namespace DayPilot.Web.Ui
                     resourceId = val;
                 }
 
-                ((ArrayList)ViewState["Items"]).Add(new Event(val, StartDate, EndDate, start, end, arrivalDateTime, departureDateTime,
-                    name, resourceId, resourceName, acType,  dataItem, Convert.ToInt32(EventFontSize.Replace("px", "")), CellWidth, CellDuration, wpnoi, wpno, mhr, bookedMHR, stationName));
+                ((List<Event>)ViewState["Items"]).Add(new Event(val, StartDate, EndDate, start, end, arrivalDateTime, departureDateTime,
+                    name, resourceId, resourceName, acType, workType, dataItem, Convert.ToInt32(EventFontSize.Replace("px", "")), CellWidth, CellDuration, wpnoi, wpno, mhr, bookedMHR, stationName));
 
             }
             //Убрать если хочется, чтобы компактно выглядело

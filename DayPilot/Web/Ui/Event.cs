@@ -74,6 +74,7 @@ namespace DayPilot.Web.Ui
 	    public string Resource;
 	    public string ResourceName;
 	    public ACType ACType;
+	    public WorkType WorkType;
 
 		/// <summary>
 		/// Column to which this event belongs.
@@ -138,6 +139,33 @@ namespace DayPilot.Web.Ui
             this.Text = text.Replace("\t", "").Replace("\n", "");
             this.Resource = resource;
             this.ResourceName = resourceName;
+            this.ACType = acType;
+            this.WPNOI = wpnoi;
+            this.WPNO = wpno;
+            this.MHR = mhr;
+            this.BookedMHR = bookedMHR;
+            this.StationName = stationName;
+            Source = source;
+            var boxes = SetBoxes(dayStart, dayEnd, fontSize, cellWidth, cellDuration);
+            BoxStart = boxes.BoxStart;
+            BoxEnd = boxes.BoxEnd;
+        }
+
+        public Event(string id, DateTime dayStart, DateTime dayEnd,
+            DateTime start, DateTime end, DateTime arrival, DateTime departure,
+            string text, string resource, string resourceName, ACType acType, WorkType workType, object source,
+            int fontSize, int cellWidth, int cellDuration, Int64 wpnoi,
+            string wpno, string mhr, string bookedMHR, string stationName)
+        {
+            this.Id = id;
+            this.Start = start;
+            this.Arrival = arrival;
+            this.End = end;
+            this.Departure = departure;
+            this.Text = text.Replace("\t", "").Replace("\n", "");
+            this.Resource = resource;
+            this.ResourceName = resourceName;
+            this.WorkType = workType;
             this.ACType = acType;
             this.WPNOI = wpnoi;
             this.WPNO = wpno;
@@ -290,7 +318,7 @@ namespace DayPilot.Web.Ui
 
             //Если в прерыдущем column одни типы ВС - A32S - а в следущем другой тип, новый блок не создавать
             //Ебрать если надо все компактно выводить
-            if (this.ACType != e.ACType)
+            if (this.ACType != e.ACType || this.WorkType != e.WorkType)
                 return true;
             return (this.BoxStart < e.BoxEnd && this.BoxEnd > e.BoxStart);
         }

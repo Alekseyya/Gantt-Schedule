@@ -60,6 +60,14 @@ namespace DayPilot.Web.Ui
             this.Filter = filter;
         }
 
+        public Resource(string name, string val, List<WorkType> workTypes)
+        {
+            Columns = new List<ResourceColumn>();
+            this.Name = name;
+            this.Value = val;
+            this.WorkTypes = workTypes;
+        }
+
         /// <summary>
         /// Row value (id).
         /// </summary>
@@ -72,6 +80,8 @@ namespace DayPilot.Web.Ui
 
         public List<string> PL { get; set; }
         public List<ACType> Filter { get; set; }
+
+        public List<WorkType> WorkTypes { get; set; }
 
 
         /// <summary>

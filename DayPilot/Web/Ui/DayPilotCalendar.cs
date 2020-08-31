@@ -1362,7 +1362,7 @@ namespace DayPilot.Web.Ui
 
                 if (Items != null)
                 {
-                    _days[i].Load(Items);
+                    //_days[i].Load(Items);
                 }
             }
         }

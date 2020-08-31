@@ -22,7 +22,11 @@ namespace Core.Model
         Saturday,
     }
 
-    
+    public enum WorkType
+    {
+        Mandatory,
+        Optional
+    }
 
     public enum ACType
     {
@@ -111,6 +115,46 @@ namespace Core.Model
         /// Пользовательские ремарки
         /// </summary>
         public string INTERNAL_REMARKS { get; set; }
+
+        public WorkType WorkType { get; set; }
+
+        public enum WorkTypeColor
+        {
+            [Display(Name = "#A52A2A")]
+            Brown,
+            [Display(Name = "#FFA500")]
+            Orange,
+            [Display(Name = "#FF0000")]
+            Red,
+            [Display(Name = "#0000FF")]
+            Blue,
+            [Display(Name = "#DB7093")]
+            PaleVioletRed,
+            [Display(Name = "#C71585")]
+            MediumVioletRed,
+            [Display(Name = "#00FFFF")]
+            Aqua,
+            [Display(Name = "#ADFF2F")]
+            GreenYellow,
+            [Display(Name = "#000000")]
+            Black,
+        }
+
+        public string HEXColorWorkColor
+        {
+            get
+            {
+                switch (WorkType)
+                {
+                    case WorkType.Mandatory:
+                        return WorkTypeColor.Red.GetAttributeOfType<DisplayAttribute>().Name;
+                    case WorkType.Optional:
+                        return WorkTypeColor.Orange.GetAttributeOfType<DisplayAttribute>().Name;
+                    default:
+                        return WorkTypeColor.Black.GetAttributeOfType<DisplayAttribute>().Name;
+                }
+            }
+        }
 
         /// <summary>
         /// Тип BC(Список работ WP)
@@ -228,21 +272,21 @@ namespace Core.Model
         /// <summary>
         /// Дата начала ТО факт
         /// </summary>
-        public DateTime ACT_START_DATE { get; set; }
+        public DateTime FactStartDate { get; set; }
 
         /// <summary>
         /// Дата начала проведения ТО(Дата начала ТО план)
         /// </summary>
-        public DateTime PL_START_DATE { get; set; }
+        public DateTime StartDate { get; set; }
         /// <summary>
         /// Готовность ВС к эксплуатации(Должно быть в DateTime)
         /// </summary>
-        public DateTime ACT_END_DATE { get; set; }
+        public DateTime FactEndDate { get; set; }
 
         /// <summary>
         /// Дата окончания ТО план
         /// </summary>
-        public DateTime PL_END_DATE { get; set; }
+        public DateTime EndDate { get; set; }
 
 
         /// <summary>
@@ -251,19 +295,9 @@ namespace Core.Model
         public DateTime CREATED_DATE { get; set; }
 
         /// <summary>
-        /// Дата последнего изменения
-        /// </summary>
-        public int MUTATION { get; set; }
-
-        /// <summary>
         /// Y - если содержит C-ch (флаг для отображениея "Готовность")
         /// </summary>
         public bool CONTAINS_C_CHECK { get; set; }
-
-        /// <summary>
-        /// Время последнего изменения
-        /// </summary>
-        public int MUTATION_TIME { get; set; }
 
         /// <summary>
         /// Человеко-часы на техническое обслуживани плановая(ч/ч)

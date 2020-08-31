@@ -148,6 +148,7 @@ namespace WebApp.Controllers
             scheduler.BookedMHRField = "bookedMHR";
             scheduler.DataResourceNameField = "resourceName";
             scheduler.ACTypeField = "acType";
+            scheduler.WorkTypeField = "workType";
             scheduler.StationNameField = "stationName";
 
             //отображение по дням без вертикальных линий по два часа
@@ -182,8 +183,9 @@ namespace WebApp.Controllers
 
             var listResources = new List<Resource>()
             {
-                new Resource("Дом", "A", new List<string>{"PL03", "PL30"}, new List<ACType>{ ACType.RRJ,ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
-                new Resource("Работа", "B", new List<string> { "PL10", "PL100" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
+                new Resource("Дом", "A",  new List<WorkType> {WorkType.Mandatory, WorkType.Optional}),
+                new Resource("Работа", "B",  new List<WorkType> {WorkType.Optional, WorkType.Mandatory}),
+                
                 new Resource("ОТО ангар", "C", new List<string> { "PL06", "PL060" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
                 new Resource("A-ch, AOG", "D", new List<string> { "PL02", "PL020", "PL012", "PL0120" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ }),
                 new Resource("Мойки ВС", "E", new List<string> { "PL11", "PL110" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ })
@@ -403,7 +405,6 @@ namespace WebApp.Controllers
             return binData;
         }
 
-        //Поубирать лишние параметры
         protected (DataRow dr, int counter) CreateRowByPL(DataTable dt, DataRow dr, DateTime start, DateTime dateTimeStartTO,
             DateTime dateTimeEndTO, int counter, string resource, string resourceName, ACType acType, TypeReport typeReports, List<WPPlanDAO> entriesPL)
         {
@@ -413,8 +414,8 @@ namespace WebApp.Controllers
                 {
                     dr = dt.NewRow();
                     dr["id"] = counter;
-                    var differenceBetweenTwoStartDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.PL_START_DATE);
-                    var differenceBetweenTwoStartDatesInHours = entryPL.PL_START_DATE.Date.DifferenceBetweenTwoDatesInHours(entryPL.PL_START_DATE);
+                    var differenceBetweenTwoStartDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.StartDate);
+                    var differenceBetweenTwoStartDatesInHours = entryPL.StartDate.Date.DifferenceBetweenTwoDatesInHours(entryPL.StartDate);
                     if (differenceBetweenTwoStartDates >= 0 && differenceBetweenTwoStartDatesInHours >= 0)
                     {
                         dr["start"] = start.AddDays(differenceBetweenTwoStartDates).AddHours(differenceBetweenTwoStartDatesInHours);
@@ -422,11 +423,11 @@ namespace WebApp.Controllers
                     }
                     else
                     {
-                        dr["start"] = entryPL.PL_START_DATE;
+                        dr["start"] = entryPL.StartDate;
                         dr["arrival"] = entryPL.Arrival;
                     }
-                    var differenceBetweenTwoEndDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.PL_END_DATE);
-                    var differenceBetweenTwoEndDatesInHours = entryPL.PL_END_DATE.Date.DifferenceBetweenTwoDatesInHours(entryPL.PL_END_DATE);
+                    var differenceBetweenTwoEndDates = dateTimeStartTO.DifferenceBetweenTwoDates(entryPL.EndDate);
+                    var differenceBetweenTwoEndDatesInHours = entryPL.EndDate.Date.DifferenceBetweenTwoDatesInHours(entryPL.EndDate);
                     if (differenceBetweenTwoEndDates >= 0 && differenceBetweenTwoEndDatesInHours >= 0)
                     {
                         dr["end"] = start.AddDays(differenceBetweenTwoEndDates).AddHours(differenceBetweenTwoEndDatesInHours);
@@ -434,7 +435,7 @@ namespace WebApp.Controllers
                     }
                     else
                     {
-                        dr["end"] = entryPL.PL_END_DATE;
+                        dr["end"] = entryPL.EndDate;
                         dr["departure"] = entryPL.Departure;
                     }
                     dr["name"] = entryPL.Description;
@@ -457,17 +458,17 @@ namespace WebApp.Controllers
                 {
                     dr = dt.NewRow();
                     dr["id"] = counter;
-                    var startDate = entryPL.ACT_START_DATE;
-                    var endDate = entryPL.ACT_END_DATE;
+                    var startDate = entryPL.FactStartDate;
+                    var endDate = entryPL.FactEndDate;
 
-                    if (entryPL.ACT_START_DATE == DateTime.MinValue)
+                    if (entryPL.FactStartDate == DateTime.MinValue)
                     {
-                        startDate = entryPL.PL_START_DATE;
+                        startDate = entryPL.StartDate;
                     }
 
-                    if (entryPL.ACT_END_DATE == DateTime.MinValue)
+                    if (entryPL.FactEndDate == DateTime.MinValue)
                     {
-                        endDate = entryPL.PL_END_DATE;
+                        endDate = entryPL.EndDate;
                     }
 
                     var differenceBetweenTwoStartDates = dateTimeStartTO.DifferenceBetweenTwoDates(startDate);
@@ -514,6 +515,57 @@ namespace WebApp.Controllers
             }
             return (dr, counter);
         }
+        
+
+        protected (DataRow dr, int counter) CreateRow(DataTable dt, DataRow dr, DateTime start, DateTime dateTimeStartTO,
+            DateTime dateTimeEndTO, int counter, string resource, string resourceName, List<WPPlanDAO> entries)
+        {
+            foreach (var entry in entries)
+            {
+                dr = dt.NewRow();
+                dr["id"] = counter;
+                var differenceBetweenTwoStartDates = dateTimeStartTO.DifferenceBetweenTwoDates(entry.StartDate);
+                var differenceBetweenTwoStartDatesInHours = entry.StartDate.Date.DifferenceBetweenTwoDatesInHours(entry.StartDate);
+                if (differenceBetweenTwoStartDates >= 0 && differenceBetweenTwoStartDatesInHours >= 0)
+                {
+                    dr["start"] = start.AddDays(differenceBetweenTwoStartDates).AddHours(differenceBetweenTwoStartDatesInHours);
+                    dr["arrival"] = entry.Arrival;
+                }
+                else
+                {
+                    dr["start"] = entry.StartDate;
+                    dr["arrival"] = entry.Arrival;
+                }
+                var differenceBetweenTwoEndDates = dateTimeStartTO.DifferenceBetweenTwoDates(entry.EndDate);
+                var differenceBetweenTwoEndDatesInHours = entry.EndDate.Date.DifferenceBetweenTwoDatesInHours(entry.EndDate);
+                if (differenceBetweenTwoEndDates >= 0 && differenceBetweenTwoEndDatesInHours >= 0)
+                {
+                    dr["end"] = start.AddDays(differenceBetweenTwoEndDates).AddHours(differenceBetweenTwoEndDatesInHours);
+                    dr["departure"] = entry.Departure;
+                }
+                else
+                {
+                    dr["end"] = entry.EndDate;
+                    dr["departure"] = entry.Departure;
+                }
+                dr["name"] = entry.Description;
+                dr["resource"] = resource;
+                dr["color"] = entry.HEXColorWorkColor;
+                dr["wpnoi"] = entry.WPNO_I;
+                dr["wpno"] = entry.WPNO;
+                dr["mhr"] = entry.MHR;
+                dr["bookedMHR"] = entry.BOOKED_MHR;
+                dr["resourceName"] = resourceName;
+                dr["acType"] = entry.AC_TYP;
+                dr["workType"] = entry.WorkType;
+                dr["stationName"] = entry.STATION_NAME;
+                dt.Rows.Add(dr);
+                counter++;
+            }
+
+            return (dr, counter);
+        }
+
 
         protected List<WPPlanDAO> SortResourcesByWC(List<WPPlanDAO> entriesPL, List<ACType> sortWC, TypeReport typeReport)
         {
@@ -521,37 +573,68 @@ namespace WebApp.Controllers
             //по каждому критерию сортировки
             foreach (var sort in sortWC)
             {
-
                 if (typeReport == TypeReport.Plan)
-                    tmpWpPlan.AddRange(entriesPL.Where(x => x.AC_TYP == sort).OrderByDescending(x=>x.PL_START_DATE));
+                    tmpWpPlan.AddRange(entriesPL.Where(x => x.AC_TYP == sort).OrderByDescending(x=>x.StartDate));
                 else
-                    tmpWpPlan.AddRange(entriesPL.Where(x => x.AC_TYP == sort).OrderByDescending(x => x.ACT_START_DATE));
+                    tmpWpPlan.AddRange(entriesPL.Where(x => x.AC_TYP == sort).OrderByDescending(x => x.FactStartDate));
             }
             return tmpWpPlan;
         }
 
-        protected void CreateDataTable(DateTime start, DateTime dateTimeStartTO, DateTime dateTimeEndTO, DataRow dr, DataTable dt, int day, ACType acType,
+        protected List<WPPlanDAO> SortResourcesByWorkType(List<WPPlanDAO> entriesPL, List<WorkType> workTypes)
+        {
+            var workPlans = new List<WPPlanDAO>();
+            //по каждому критерию сортировки
+            foreach (var sort in workTypes)
+            {
+                workPlans.AddRange(entriesPL.Where(x => x.WorkType == sort).OrderBy(x => x.StartDate));
+            }
+            return workPlans;
+        }
+
+
+        protected void CreateDataTable(DateTime start, DateTime dateTimeStartTO, DateTime dateTimeEndTO, DataRow dr, DataTable dt, int day,
+            ACType acType,
             TypeReport typeReport, int planVersion, List<Resource> resources)
         {
+            var entries = new List<WPPlanDAO>()
+            {
+                new WPPlanDAO(){WorkType = WorkType.Optional, Description = "Готовка еды", StartDate = new DateTime(2020, 08, 31, 20, 00, 00), EndDate = new DateTime(2020, 08, 31, 22, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Optional, Description = "Мойка посуды", StartDate = new DateTime(2020, 08, 31, 22, 00, 00), EndDate = new DateTime(2020, 08, 31, 23, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Mandatory, Description = "Задача 1", StartDate = new DateTime(2020, 09, 01, 10, 00, 00), EndDate = new DateTime(2020, 09, 01, 12, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Mandatory, Description = "Задача 2", StartDate = new DateTime(2020, 09, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 01, 20, 00, 00)}
+            };
+
             var counter = 0;
             //По каждому ресурсу
             foreach (var resource in resources)
             {
                 var entriesPL = new List<WPPlanDAO>();
-                foreach (var pl in resource.PL)
+                if (resource.PL != null)
                 {
-                    if(typeReport == TypeReport.Plan)
-                        entriesPL.AddRange(_wpPlanRepository.GetPlanByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
-                    else
-                        entriesPL.AddRange(_wpPlanRepository.GetFactByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
-                }
-                //Сортировка в ресурсе
-                entriesPL = SortResourcesByWC(entriesPL, resource.Filter, typeReport);
+                    foreach (var pl in resource.PL)
+                    {
+                        if (typeReport == TypeReport.Plan)
+                            entriesPL.AddRange(_wpPlanRepository.GetPlanByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
+                        else
+                            entriesPL.AddRange(_wpPlanRepository.GetFactByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
+                    }
+                    //Сортировка в ресурсе
+                    entriesPL = SortResourcesByWC(entriesPL, resource.Filter, typeReport);
 
-                var createResource = CreateRowByPL(dt, dr, start, dateTimeStartTO,
-                    dateTimeEndTO, counter, resource.Value, resource.Name, acType, typeReport, entriesPL);
-                counter = createResource.counter;
-                dr = createResource.dr;
+                    var createResource = CreateRowByPL(dt, dr, start, dateTimeStartTO,
+                        dateTimeEndTO, counter, resource.Value, resource.Name, acType, typeReport, entriesPL);
+                    counter = createResource.counter;
+                    dr = createResource.dr;
+                } //Код для вставки моего плана!!!
+                else
+                {
+                    entries = SortResourcesByWorkType(entries, resource.WorkTypes);
+                    var createResource = CreateRow(dt, dr, start, dateTimeStartTO,
+                        dateTimeEndTO, counter, resource.Value, resource.Name, entries);
+                    counter = createResource.counter;
+                    dr = createResource.dr;
+                }
             }
         }
 
@@ -573,6 +656,7 @@ namespace WebApp.Controllers
             dt.Columns.Add("stationName", typeof(string));
             dt.Columns.Add("resourceName", typeof(string));
             dt.Columns.Add("acType", typeof(ACType));
+            dt.Columns.Add("workType", typeof(WorkType));
             return dt;
         }
 

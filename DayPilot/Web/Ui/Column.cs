@@ -21,6 +21,7 @@ This product includes DayPilot (http://www.daypilot.org) developed by Annpoint, 
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using DayPilot.Web.Ui;
 
 namespace DayPilot.Web.Ui
@@ -30,7 +31,7 @@ namespace DayPilot.Web.Ui
 	/// </summary>
 	public class Column
 	{
-		private ArrayList events = new ArrayList();
+		private List<Event> events = new List<Event>();
 		public Block Block;
 
 		/// <summary>

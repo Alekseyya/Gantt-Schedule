@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DayPilot.Web.Ui
@@ -9,8 +10,8 @@ namespace DayPilot.Web.Ui
 	/// </summary>
 	public class Block
 	{
-		public ArrayList Columns;
-		private ArrayList events = new ArrayList();
+		public List<Column> Columns;
+		private List<Event> events = new List<Event>();
 
 
 		internal Block()
@@ -36,7 +37,7 @@ namespace DayPilot.Web.Ui
 		private void arrangeColumns()
 		{
 			// cleanup
-			this.Columns = new ArrayList();
+			this.Columns = new List<Column>();
 
 			foreach(Event e in events)
 				e.Column = null;
@@ -71,7 +72,7 @@ namespace DayPilot.Web.Ui
             //Если в прерыдущем column одни типы ВС - A32S - а в следущем другой тип, новый блок не создавать
 			//Если надо будет пододвинуть блоки в один ряд, убрать и немного переделать
             //if (events.Cast<Event>().All(x => x.ACType != e.ACType))
-			if(events.Cast<Event>().Any(x=>x.ACType != e.ACType))
+			if(events.Any(x=>x.ACType != e.ACType) || events.Any(evt => evt.WorkType != e.WorkType))
                 return true;
 
             return (this.BoxStart < e.BoxEnd && this.BoxEnd > e.BoxStart);
