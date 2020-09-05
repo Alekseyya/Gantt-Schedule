@@ -260,59 +260,29 @@ namespace WebApp.Controllers
             dateTimeStart = dateTimeStart.StartOfDay();
             dateTimeEnd = dateTimeEnd.EndOfDay();
             var currentTypeReports = (TypeReport)(typeReport.HasValue ? typeReport : TypeReport.Plan);
-            var html = "";// @"<p>This <em>is </em><span class=""headline"" style=""text-decoration: underline;"">some</span> <strong>sample <em> text</em></strong><span style=""color: red;"">!!!</span></p>";
+            var html = "";
             var css = Properties.Resources.scheduler_transparent + "@page {margin: 0;}";// @".headline{font-size:200%}";
             var wcType = acType.HasValue ? acType.Value : ACType.All;
             string tabHtmlString;
             var userName = (User.Identity.Name.IndexOf("\\") != -1) ? User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1) : User.Identity.Name;
             var currentPlanVersion = planVersion.HasValue && planVersion.Value != 0 ? planVersion.Value : _wpPlanRepository.InsertTemporaryPlan(DateTime.Today.DifferenceBetweenTwoDates(dateTimeStart), DateTime.Today.DifferenceBetweenTwoDates(dateTimeEnd), userName);
-            //Enum.TryParse(tabString, out Tab tab);
-            var signature = string.Empty;
-            var placeSignaturePTO = "<div style='float: right;font-size: 0.6em;'>" +
-                                 "<span style = 'display:block;'>Согласовано</span>" +
-                                 "<span style = 'display:block;'>Начальник службы ПТО ВС</span>" +
-                                 "<div style = 'margin-left:35px'>" +
-                                 "<span style = 'margin-left:150px'>О.А.Бригадинский </span>" +
-                                 "<div>" +
-                                 "<span style = 'width: 238px;display: inline-block;border-bottom-color: black;border-bottom: 1px solid black;'>" +
-                                 "<span> \"</span>" + "<span style = margin-left:100px> \"</span>" + "</span> " +
-                                 "<span style = 'margin-left:40px'>2020</span> " +
-                                 "</div>" +
-                                 "</div>" +
-                                 "</div>";
-            var placeSignatureOTO = "<div style='float: right;font-size: 0.6em;'>" +
-                                    "<span style = 'display:block;'>Согласовано</span>" +
-                                    "<span style = 'display:block;'>Начальник службы ПТО ВС</span>" +
-                                    "<div style = 'margin-left:35px'>" +
-                                    "<span style = 'margin-left:150px'>А.В.Горячев</span>" +
-                                    "<div>" +
-                                    "<span style = 'width: 210px;display: inline-block;border-bottom-color: black;border-bottom: 1px solid black;'>" +
-                                    "<span> \"</span>" + "<span style = margin-left:100px> \"</span>" + "</span> " +
-                                    "<span style = 'margin-left:40px'>2020</span> " +
-                                    "</div>" +
-                                    "</div>" +
-                                    "</div>";
+            
             switch (tab)
             {
                 case Tab.PTO:
                     tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
-                    signature = placeSignaturePTO;
                     break;
                 default:
                     tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
                     break;
             }
-
-            
-
             html = "<html>"
                 + "<head>"
                 + "<meta http-equiv='content-type' content='application/xhtml+xml; charset=UTF-8;' />"
                 + "</head>"
                 + "<body><style type='text/css'>" + css + "</style>"
                 + "<table style='border-spacing: 0; border-collapse: collapse; width: 100%;'> <tr><td>"
-                + tabHtmlString + "</td></tr></table>" + signature
-                + "</body></html>";
+                + tabHtmlString + "</td></tr></table>" + "</body></html>";
             binData = CreatePDF(html);
             return File(binData, "application / pdf", "Report" + DateTime.Now.ToString("ddMMyyHHmmss") + ".pdf");
         }
@@ -343,23 +313,10 @@ namespace WebApp.Controllers
         private byte[] CreatePDF(string html)
         {
             byte[] binData;
-
-            //Пиксели в pt = 1*0.75
-            //Парамеры: ширина блока ресурсов, ширина 5 дней(влезает в a4), высота с двойной шапкой
-
-            #region Оставить
-
             using (var workStream = new MemoryStream())
             {
                 var pdfWriter = new PdfWriter(workStream);
                 var pdf = new PdfDocument(pdfWriter);
-                ////создали один pdf документ
-                //pdf.SetDefaultPageSize(new PageSize(ReportWidth * 0.75f, ReportHeight * 0.75f));
-                ////основной документ
-                //HtmlConverter.ConvertToDocument(html, pdf, new ConverterProperties());
-
-
-                #region Рабочий код для листов после первого
                 PdfDocument sourcePdf = new PdfDocument(new PdfReader(new MemoryStream(CreateDocument(html))));
                 //Original page
                 PdfPage origPage = sourcePdf.GetPage(1);
@@ -384,48 +341,10 @@ namespace WebApp.Controllers
                     transformCanvas.AddXObject(pageCopy, 30, tileSize.GetHeight() + (tileSize.GetHeight() - orig.GetHeight()) -20);
                 else
                     transformCanvas.AddXObject(pageCopy, 30, 20);
-
-                ////Две страницы, на первой 5 дней, на второй все остальные
-                ////The first tile
-                //var widthFiveDays = 990;
-                //Rectangle toMoveFirstPage = new Rectangle(0, 0, widthFiveDays * 0.75f, ReportHeight * 0.75f);
-                //PdfPage page = pdf.AddNewPage(PageSize.A4.Rotate());
-                //PdfCanvas canvas = new PdfCanvas(page);
-                //canvas.Rectangle(0, 0, toMoveFirstPage.GetWidth(), toMoveFirstPage.GetHeight());
-                //canvas.Clip();
-                //canvas.NewPath();
-                ////по x и по Y
-                //canvas.AddXObject(pageCopy, 0, -200);
-
-                ////The second tile
-                ////100 - чтобы поднять снизу от конца листа
-                //Rectangle toMoveSecondPage = new Rectangle((ReportWidth - widthFiveDays) * 0.75f, ReportHeight * 0.75f);
-                //page = pdf.AddNewPage(PageSize.A4.Rotate());
-                //canvas = new PdfCanvas(page);
-                //canvas.Rectangle(0, 0, toMoveSecondPage.GetWidth(), toMoveSecondPage.GetHeight());
-                //canvas.Clip();
-                //canvas.NewPath();
-                //canvas.AddXObject(pageCopy, -widthFiveDays * 0.75f, 0);
-
-
-                ////Для разбивки по горизонтали
-                ////The third tile
-                //page = pdf.AddNewPage(PageSize.A4.Rotate());
-                //canvas = new PdfCanvas(page);
-                //canvas.ConcatMatrix(transformationMatrix);
-                //canvas.AddXObject(pageCopy, 0, 0);
-                ////The fourth tile
-                //page = pdf.AddNewPage(PageSize.A4.Rotate());
-                //canvas = new PdfCanvas(page);
-                //canvas.ConcatMatrix(transformationMatrix);
-                //canvas.AddXObject(pageCopy, -orig.GetWidth() / 2f, 0);
-                #endregion
                 pdf.Close();
                 pdfWriter.Close();
                 binData = workStream.ToArray();
             }
-
-            #endregion
 
             return binData;
         }
