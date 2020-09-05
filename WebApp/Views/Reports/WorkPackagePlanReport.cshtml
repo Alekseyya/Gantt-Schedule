@@ -105,19 +105,7 @@
         <div class="col-md-12">
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a href="#PTO" aria-controls="PTO" role="tab" data-toggle="tab">ПТО</a>
-                </li>
-                <li role="presentation">
-                    <a href="#OTO" aria-controls="OTO" role="tab" data-toggle="tab">OTO</a>
-                </li>
-                <li role="presentation">
-                    <a href="#TOOUT" aria-controls="TOOUT" role="tab" data-toggle="tab">TO OUT</a>
-                </li>
-                <li role="presentation">
-                    <a href="#AT" aria-controls="AT" role="tab" data-toggle="tab">A-T</a>
-                </li>
-                <li role="presentation">
-                    <a href="#WDTM" aria-controls="WDTM" role="tab" data-toggle="tab">Стоянка/Хранение ВС</a>
+                    <a href="#tasks" aria-controls="current" role="tab" data-toggle="tab">Задачи на 10 дней</a>
                 </li>
             </ul>
         </div>
@@ -131,7 +119,7 @@
     <div class="row">
         <div class="col-md-12">
             <div class="tab-content">
-                <div role="tabpanel" class="tab-pane active" id="PTO">
+                <div role="tabpanel" class="tab-pane active" id="tasks">
                     <div style="">
                         @Html.Raw(ViewBag.WorkPackagePlanReportPTO)
                     </div>
@@ -145,91 +133,6 @@
                             <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
                                                                                 new {tab = Tab.PTO, dateStart = ViewBag.DateStartTO,
                                                                                     dateEnd = ViewBag.DateEndTO,
-                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
-                        </div>
-                    </div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="OTO">
-                    <div style="">
-                        @Html.Raw(ViewBag.WorkPackagePlanReportOTO)
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
-                                                                                new {tab = Tab.OTO, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
-                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
-                        </div>
-                    </div>
-                </div>
-                @*<div role="tabpanel" class="tab-pane" id="WOUT">
-                    <div style="">
-                        @Html.Raw(ViewBag.WorkPackagePlanReportWOUT)
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
-                                                                                new {tab = Tab.W_OUT, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
-                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
-                        </div>
-                    </div>
-                </div>*@
-                <div role="tabpanel" class="tab-pane" id="TOOUT">
-                    <div style="">
-                        @Html.Raw(ViewBag.WorkPackagePlanReportTOOUT)
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
-                                                                                new {tab = Tab.TO_OUT, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
-                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
-                        </div>
-                    </div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="AT">
-                    <div style="">
-                        @Html.Raw(ViewBag.WorkPackagePlanReportAT)
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
-                                                                                new {tab = Tab.A_T, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
-                                                                                    acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
-                        </div>
-                    </div>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="WDTM">
-                    <div style="">
-                        @Html.Raw(ViewBag.WorkPackagePlanReportWDTM)
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            &nbsp;
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <a class="btn btn-default" runat="server" href="@Url.Action("ExportWorkPackagePlanReportToPDF", "Reports",
-                                                                                new {tab = Tab.WDTM, dateStart = ViewBag.DateStartTO, dateEnd = ViewBag.DateEndTO,
                                                                                     acType = ViewBag.ВС, typeReport = ViewBag.TypeReport, planVersion =ViewBag.PlanVersion})">Экспорт PDF</a>
                         </div>
                     </div>

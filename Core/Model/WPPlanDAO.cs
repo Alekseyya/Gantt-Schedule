@@ -24,8 +24,9 @@ namespace Core.Model
 
     public enum WorkType
     {
-        Mandatory,
-        Optional
+        Primary,
+        Optional,
+        Sleep
     }
 
     public enum ACType
@@ -146,10 +147,12 @@ namespace Core.Model
             {
                 switch (WorkType)
                 {
-                    case WorkType.Mandatory:
+                    case WorkType.Primary:
                         return WorkTypeColor.Red.GetAttributeOfType<DisplayAttribute>().Name;
                     case WorkType.Optional:
                         return WorkTypeColor.Orange.GetAttributeOfType<DisplayAttribute>().Name;
+                    case WorkType.Sleep:
+                        return WorkTypeColor.GreenYellow.GetAttributeOfType<DisplayAttribute>().Name;
                     default:
                         return WorkTypeColor.Black.GetAttributeOfType<DisplayAttribute>().Name;
                 }

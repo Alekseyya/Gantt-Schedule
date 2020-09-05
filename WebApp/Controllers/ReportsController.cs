@@ -181,14 +181,39 @@ namespace WebApp.Controllers
 
             scheduler.TimeFormat = DayPilot.Web.Ui.Enums.TimeFormat.Clock24Hours;
 
+
+            var entriesHome = new List<WPPlanDAO>()
+            {
+                new WPPlanDAO(){Arrival = new DateTime(2020, 08, 31, 16, 00, 00), Departure = new DateTime(2020, 08, 31, 20, 00, 00), WorkType = WorkType.Optional, Description = "Готовка еды", StartDate = new DateTime(2020, 08, 31, 20, 00, 00),
+                    EndDate = new DateTime(2020, 08, 31, 23, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Optional, Description = "Мойка посуды", StartDate = new DateTime(2020, 08, 31, 22, 00, 00), EndDate = new DateTime(2020, 08, 31, 23, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Sleep, Description = "Сон", StartDate = new DateTime(2020, 09, 01, 02, 00, 00), EndDate = new DateTime(2020, 09, 01, 10, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Sleep, Description = "Сон", StartDate = new DateTime(2020, 09, 02, 02, 00, 00), EndDate = new DateTime(2020, 09, 02, 10, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Sleep, Description = "Сон", StartDate = new DateTime(2020, 09, 03, 02, 00, 00), EndDate = new DateTime(2020, 09, 03, 10, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Sleep, Description = "Сон", StartDate = new DateTime(2020, 09, 04, 02, 00, 00), EndDate = new DateTime(2020, 09, 04, 10, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Sleep, Description = "Сон", StartDate = new DateTime(2020, 09, 05, 02, 00, 00), EndDate = new DateTime(2020, 09, 05, 10, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Задача 1 в блокноте", StartDate = new DateTime(2020, 09, 01, 10, 00, 00), EndDate = new DateTime(2020, 09, 01, 12, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Задача 2 в блокноте", StartDate = new DateTime(2020, 09, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 01, 20, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Подготовка к собеседованиям", StartDate = new DateTime(2020, 08, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 20, 20, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Переделать проект", StartDate = new DateTime(2020, 08, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 03, 20, 00, 00)}
+            };
+
+            var entriesWork = new List<WPPlanDAO>()
+            {
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Задача 789", StartDate = new DateTime(2020, 09, 01, 10, 00, 00), EndDate = new DateTime(2020, 09, 01, 12, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Задача 700", StartDate = new DateTime(2020, 09, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 01, 20, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Primary, Description = "Задача 56", StartDate = new DateTime(2020, 08, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 20, 20, 00, 00)},
+                new WPPlanDAO(){WorkType = WorkType.Optional, Description = "Задача 53", StartDate = new DateTime(2020, 08, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 03, 20, 00, 00)}
+            };
+
             var listResources = new List<Resource>()
             {
-                new Resource("Дом", "A",  new List<WorkType> {WorkType.Mandatory, WorkType.Optional}),
-                new Resource("Работа", "B",  new List<WorkType> {WorkType.Optional, WorkType.Mandatory}),
+                new Resource("Дом", "A", entriesHome,  new List<WorkType> {WorkType.Sleep, WorkType.Primary, WorkType.Optional}),
+                new Resource("Работа", "B", entriesWork, new List<WorkType> {WorkType.Sleep, WorkType.Optional, WorkType.Primary}),
                 
-                new Resource("ОТО ангар", "C", new List<string> { "PL06", "PL060" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
-                new Resource("A-ch, AOG", "D", new List<string> { "PL02", "PL020", "PL012", "PL0120" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ }),
-                new Resource("Мойки ВС", "E", new List<string> { "PL11", "PL110" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ })
+                //new Resource("ОТО ангар", "C", new List<string> { "PL06", "PL060" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
+                //new Resource("A-ch, AOG", "D", new List<string> { "PL02", "PL020", "PL012", "PL0120" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ }),
+                //new Resource("Мойки ВС", "E", new List<string> { "PL11", "PL110" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ })
             };
             foreach (var resource in listResources)
             {
@@ -597,44 +622,35 @@ namespace WebApp.Controllers
             ACType acType,
             TypeReport typeReport, int planVersion, List<Resource> resources)
         {
-            var entries = new List<WPPlanDAO>()
-            {
-                new WPPlanDAO(){WorkType = WorkType.Optional, Description = "Готовка еды", StartDate = new DateTime(2020, 08, 31, 20, 00, 00), EndDate = new DateTime(2020, 08, 31, 22, 00, 00)},
-                new WPPlanDAO(){WorkType = WorkType.Optional, Description = "Мойка посуды", StartDate = new DateTime(2020, 08, 31, 22, 00, 00), EndDate = new DateTime(2020, 08, 31, 23, 00, 00)},
-                new WPPlanDAO(){WorkType = WorkType.Mandatory, Description = "Задача 1", StartDate = new DateTime(2020, 09, 01, 10, 00, 00), EndDate = new DateTime(2020, 09, 01, 12, 00, 00)},
-                new WPPlanDAO(){WorkType = WorkType.Mandatory, Description = "Задача 2", StartDate = new DateTime(2020, 09, 01, 12, 00, 00), EndDate = new DateTime(2020, 09, 01, 20, 00, 00)}
-            };
-
             var counter = 0;
             //По каждому ресурсу
             foreach (var resource in resources)
             {
                 var entriesPL = new List<WPPlanDAO>();
-                if (resource.PL != null)
-                {
-                    foreach (var pl in resource.PL)
-                    {
-                        if (typeReport == TypeReport.Plan)
-                            entriesPL.AddRange(_wpPlanRepository.GetPlanByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
-                        else
-                            entriesPL.AddRange(_wpPlanRepository.GetFactByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
-                    }
-                    //Сортировка в ресурсе
-                    entriesPL = SortResourcesByWC(entriesPL, resource.Filter, typeReport);
+                //if (resource.PL != null)
+                //{
+                //    foreach (var pl in resource.PL)
+                //    {
+                //        if (typeReport == TypeReport.Plan)
+                //            entriesPL.AddRange(_wpPlanRepository.GetPlanByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
+                //        else
+                //            entriesPL.AddRange(_wpPlanRepository.GetFactByPLByDates(planVersion, pl, dateTimeStartTO, dateTimeEndTO, acType));
+                //    }
+                //    //Сортировка в ресурсе
+                //    entriesPL = SortResourcesByWC(entriesPL, resource.Filter, typeReport);
 
-                    var createResource = CreateRowByPL(dt, dr, start, dateTimeStartTO,
-                        dateTimeEndTO, counter, resource.Value, resource.Name, acType, typeReport, entriesPL);
+                //    var createResource = CreateRowByPL(dt, dr, start, dateTimeStartTO,
+                //        dateTimeEndTO, counter, resource.Value, resource.Name, acType, typeReport, entriesPL);
+                //    counter = createResource.counter;
+                //    dr = createResource.dr;
+                //} //Код для вставки моего плана!!!
+                //else
+                //{
+                    var entries = SortResourcesByWorkType(resource.Entries, resource.WorkTypes);
+                    var createResource = CreateRow(dt, dr, start, dateTimeStartTO, dateTimeEndTO, counter, resource.Value, resource.Name, entries);
                     counter = createResource.counter;
                     dr = createResource.dr;
-                } //Код для вставки моего плана!!!
-                else
-                {
-                    entries = SortResourcesByWorkType(entries, resource.WorkTypes);
-                    var createResource = CreateRow(dt, dr, start, dateTimeStartTO,
-                        dateTimeEndTO, counter, resource.Value, resource.Name, entries);
-                    counter = createResource.counter;
-                    dr = createResource.dr;
-                }
+                //}
             }
         }
 

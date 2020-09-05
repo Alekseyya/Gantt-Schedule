@@ -60,13 +60,16 @@ namespace DayPilot.Web.Ui
             this.Filter = filter;
         }
 
-        public Resource(string name, string val, List<WorkType> workTypes)
+        public Resource(string name, string val, List<WPPlanDAO> entries, List<WorkType> workTypes)
         {
             Columns = new List<ResourceColumn>();
             this.Name = name;
             this.Value = val;
             this.WorkTypes = workTypes;
+            this.Entries = entries;
         }
+
+        public List<WPPlanDAO> Entries { get; set; }
 
         /// <summary>
         /// Row value (id).
