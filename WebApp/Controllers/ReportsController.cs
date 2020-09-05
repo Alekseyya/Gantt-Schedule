@@ -66,7 +66,7 @@ namespace WebApp.Controllers
         }
         
         [HttpGet]
-        public ActionResult WorkPackagePlanReport(string dateStartTO, string dateEndTO, ACType? acType, TypeReport? typeReport,
+        public ActionResult WorkPackagePlanReport(string dateStartTO, string dateEndTO, ACType? acType, /*TypeReport? typeReport,*/
             int? planVersion, bool? createPlan)
         {
             if (string.IsNullOrEmpty(dateStartTO) && string.IsNullOrEmpty(dateEndTO))
@@ -77,7 +77,7 @@ namespace WebApp.Controllers
                     typeReport = TypeReport.Plan,
                     createPlan = false
                 });
-            var currentTypeReports = (TypeReport) (typeReport.HasValue ? typeReport : TypeReport.Plan);
+            //var currentTypeReports = (TypeReport) (typeReport.HasValue ? typeReport : TypeReport.Plan);
             DateTime.TryParse(dateStartTO, out DateTime dateTimeStartTO);
             DateTime.TryParse(dateEndTO, out DateTime dateTimeEndTO);
             var wcType = acType.HasValue ? acType.Value : ACType.All;
@@ -86,14 +86,14 @@ namespace WebApp.Controllers
             ViewBag.PlanVersion = null;
             if (createPlan == true || (planVersion.HasValue && planVersion != 0))
             {
-                var userName = (User.Identity.Name.IndexOf("\\") != -1) ? User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1) : User.Identity.Name;
-                var currentPlanVersion = planVersion.HasValue && planVersion != 0 ? planVersion.Value : _wpPlanRepository.InsertTemporaryPlan(DateTime.Today.DifferenceBetweenTwoDates(dateTimeStartTO), DateTime.Today.DifferenceBetweenTwoDates(dateTimeEndTO), userName);
-                ViewBag.PlanVersion = currentPlanVersion;
+                //var userName = (User.Identity.Name.IndexOf("\\") != -1) ? User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1) : User.Identity.Name;
+                //var currentPlanVersion = planVersion.HasValue && planVersion != 0 ? planVersion.Value : _wpPlanRepository.InsertTemporaryPlan(DateTime.Today.DifferenceBetweenTwoDates(dateTimeStartTO), DateTime.Today.DifferenceBetweenTwoDates(dateTimeEndTO), userName);
+                //ViewBag.PlanVersion = currentPlanVersion;
                 if (dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) <= 10)
                 {
                     dateTimeStartTO = dateTimeStartTO.StartOfDay();
                     dateTimeEndTO = dateTimeEndTO.EndOfDay();
-                    ViewBag.WorkPackagePlanReportPTO = GetWorkPlanReport(dateTimeStartTO, dateTimeEndTO, wcType, currentTypeReports, currentPlanVersion);
+                    ViewBag.WorkPackagePlanReportPTO = GetWorkPlanReport(dateTimeStartTO, dateTimeEndTO, wcType /*currentTypeReports,*/ /*currentPlanVersion*/);
                 }
             }
             ViewBag.DateStartTO = dateTimeStartTO.ToShortDateString();
@@ -109,22 +109,22 @@ namespace WebApp.Controllers
                         Selected = acType != null && (x == (ACType)acType ? true : false)
                     };
                 }), "Value", "Text");
-            ViewBag.TypeReport = typeReport.HasValue ? typeReport.Value : TypeReport.Plan;
-            ViewBag.TypeReports = new SelectList(Enum.GetValues(typeof(TypeReport)).Cast<TypeReport>()
-                .Select(x =>
-                {
-                    return new SelectListItem
-                    {
-                        Text = x.GetAttributeOfType<DisplayAttribute>().Name,
-                        Value = x.ToString(),
-                        Selected = acType != null && (x == (TypeReport)acType ? true : false)
-                    };
-                }), "Value", "Text");
+            //ViewBag.TypeReport = typeReport.HasValue ? typeReport.Value : TypeReport.Plan;
+            //ViewBag.TypeReports = new SelectList(Enum.GetValues(typeof(TypeReport)).Cast<TypeReport>()
+            //    .Select(x =>
+            //    {
+            //        return new SelectListItem
+            //        {
+            //            Text = x.GetAttributeOfType<DisplayAttribute>().Name,
+            //            Value = x.ToString(),
+            //            Selected = acType != null && (x == (TypeReport)acType ? true : false)
+            //        };
+            //    }), "Value", "Text");
 
             return View();
         }
 
-        protected string GetWorkPlanReport(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, TypeReport typeReports, int planVersion, bool oneHeader = false)
+        protected string GetWorkPlanReport(DateTime dateTimeStartTO, DateTime dateTimeEndTO, ACType acType, /*TypeReport typeReports,*/ /*int planVersion,*/ bool oneHeader = false)
         {
             string html = "";
 
@@ -225,7 +225,7 @@ namespace WebApp.Controllers
             scheduler.Days = (int)dateTimeStartTO.DifferenceBetweenTwoDatesAbs(dateTimeEndTO) + 1;
 
             var dataTable = CreateDataTableColumns();
-            CreateDataTable(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, typeReports, planVersion, listResources);
+            CreateDataTable(scheduler.StartDate, dateTimeStartTO, dateTimeEndTO, null, dataTable, scheduler.Days, acType, /*typeReports, planVersion,*/ listResources);
 
             scheduler.DataSource = dataTable;
 
@@ -259,24 +259,24 @@ namespace WebApp.Controllers
             DateTime.TryParse(dateEnd, out DateTime dateTimeEnd);
             dateTimeStart = dateTimeStart.StartOfDay();
             dateTimeEnd = dateTimeEnd.EndOfDay();
-            var currentTypeReports = (TypeReport)(typeReport.HasValue ? typeReport : TypeReport.Plan);
-            var html = "";
+            //var currentTypeReports = (TypeReport)(typeReport.HasValue ? typeReport : TypeReport.Plan);
+            //var html = "";
             var css = Properties.Resources.scheduler_transparent + "@page {margin: 0;}";// @".headline{font-size:200%}";
             var wcType = acType.HasValue ? acType.Value : ACType.All;
             string tabHtmlString;
-            var userName = (User.Identity.Name.IndexOf("\\") != -1) ? User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1) : User.Identity.Name;
-            var currentPlanVersion = planVersion.HasValue && planVersion.Value != 0 ? planVersion.Value : _wpPlanRepository.InsertTemporaryPlan(DateTime.Today.DifferenceBetweenTwoDates(dateTimeStart), DateTime.Today.DifferenceBetweenTwoDates(dateTimeEnd), userName);
+            //var userName = (User.Identity.Name.IndexOf("\\") != -1) ? User.Identity.Name.Substring(User.Identity.Name.IndexOf("\\") + 1) : User.Identity.Name;
+            //var currentPlanVersion = planVersion.HasValue && planVersion.Value != 0 ? planVersion.Value : _wpPlanRepository.InsertTemporaryPlan(DateTime.Today.DifferenceBetweenTwoDates(dateTimeStart), DateTime.Today.DifferenceBetweenTwoDates(dateTimeEnd), userName);
             
             switch (tab)
             {
                 case Tab.PTO:
-                    tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
+                    tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, /*currentTypeReports, currentPlanVersion,*/ true);
                     break;
                 default:
-                    tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, currentTypeReports, currentPlanVersion, true);
+                    tabHtmlString = GetWorkPlanReport(dateTimeStart, dateTimeEnd, wcType, /*currentTypeReports, currentPlanVersion,*/ true);
                     break;
             }
-            html = "<html>"
+            var html = "<html>"
                 + "<head>"
                 + "<meta http-equiv='content-type' content='application/xhtml+xml; charset=UTF-8;' />"
                 + "</head>"
@@ -539,13 +539,13 @@ namespace WebApp.Controllers
 
         protected void CreateDataTable(DateTime start, DateTime dateTimeStartTO, DateTime dateTimeEndTO, DataRow dr, DataTable dt, int day,
             ACType acType,
-            TypeReport typeReport, int planVersion, List<Resource> resources)
+            /*TypeReport typeReport, int planVersion,*/ List<Resource> resources)
         {
             var counter = 0;
             //По каждому ресурсу
             foreach (var resource in resources)
             {
-                var entriesPL = new List<WPPlanDAO>();
+                //var entriesPL = new List<WPPlanDAO>();
                 //if (resource.PL != null)
                 //{
                 //    foreach (var pl in resource.PL)
