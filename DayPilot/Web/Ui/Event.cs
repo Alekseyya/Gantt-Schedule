@@ -154,8 +154,7 @@ namespace DayPilot.Web.Ui
         public Event(string id, DateTime dayStart, DateTime dayEnd,
             DateTime start, DateTime end, DateTime arrival, DateTime departure,
             string text, string resource, string resourceName, ACType acType, WorkType workType, object source,
-            int fontSize, int cellWidth, int cellDuration, Int64 wpnoi,
-            string wpno, string mhr, string bookedMHR, string stationName)
+            int fontSize, int cellWidth, int cellDuration, string mhr, string bookedMHR, string stationName)
         {
             this.Id = id;
             this.Start = start;
@@ -167,8 +166,8 @@ namespace DayPilot.Web.Ui
             this.ResourceName = resourceName;
             this.WorkType = workType;
             this.ACType = acType;
-            this.WPNOI = wpnoi;
-            this.WPNO = wpno;
+            //this.WPNOI = wpnoi;
+            //this.WPNO = wpno;
             this.MHR = mhr;
             this.BookedMHR = bookedMHR;
             this.StationName = stationName;

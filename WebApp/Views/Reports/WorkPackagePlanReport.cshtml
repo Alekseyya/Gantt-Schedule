@@ -63,10 +63,6 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <label class="col-md-2">WPNO: </label>
-                        <a href="" class="col-md-10" id="wpno"></a>
-                    </div>
-                    <div class="row">
                         <label class="col-md-2">Описание: </label>
                         <div class="col-md-10" id="description"></div>
                     </div>
@@ -79,20 +75,16 @@
                         <div class="col-md-4" id="endDate"></div>
                     </div>
                     <div class="row">
-                        <label class="col-md-2">MHR: </label>
+                        <label class="col-md-2">Трудозатраты MHR: </label>
                         <div class="col-md-4" id="mhr"></div>
-                        <label class="col-md-2">Booked MHR: </label>
+                        <label class="col-md-2">Количество MHR: </label>
                         <div class="col-md-4" id="bookedMHR"></div>
                     </div>
                     <div class="row">
-                        <label class="col-md-2">Прилет: </label>
+                        <label class="col-md-2">Фактическое начало: </label>
                         <div class="col-md-4" id="arrival"></div>
-                        <label class="col-md-2">Вылет: </label>
+                        <label class="col-md-2">Фактический конец: </label>
                         <div class="col-md-4" id="departure"></div>
-                    </div>
-                    <div class="row">
-                        <label class="col-md-3">Станция ТО: </label>
-                        <div class="col-md-4" id="stationName"></div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -151,15 +143,11 @@
         $('#eventDetailsModal').on('show.bs.modal', function(event) {
             var div = $(event.relatedTarget);
             var modal = $(this);
-            var wpno = div.data('wpno');
-            modal.find('#wpno').attr("href", hrefWpnoi).text(wpno);
             modal.find('#description').text(div.data('description'));
             modal.find('#startDate').text(div.data('startdate'));
             modal.find('#arrival').text(div.data('arrival'));
             modal.find('#endDate').text(div.data('enddate'));
             modal.find('#departure').text(div.data('departure'));
-            modal.find('#columnNumber').text(div.data('columnnumber'));
-            modal.find('#height').text(div.data('height'));
             modal.find('#mhr').text(div.data('mhr'));
             modal.find('#bookedMHR').text(div.data('bookedmhr'));
             modal.find('#stationName').text(div.data('stationname'));

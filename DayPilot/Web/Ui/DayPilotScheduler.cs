@@ -1116,15 +1116,11 @@ namespace DayPilot.Web.Ui
 
                 output.AddAttribute("data-toggle", "modal");
                 output.AddAttribute("data-target", "#eventDetailsModal");
-                output.AddAttribute("data-wpnoi", ev.WPNOI.ToString());
-                output.AddAttribute("data-wpno", ev.WPNO);
                 output.AddAttribute("data-description", ev.Text.Replace("<br/>", ""));
                 output.AddAttribute("data-startDate", ev.Start.ToString("dd.MM.yyyy HH:mm"));
                 output.AddAttribute("data-arrival", ev.Arrival.ToString("HH:mm") == "00:00" ? "" : ev.Arrival.ToString("HH:mm"));
                 output.AddAttribute("data-endDate", ev.End.ToString("dd.MM.yyyy HH:mm"));
                 output.AddAttribute("data-departure", ev.Departure.ToString("HH:mm") == "00:00" ? "" : ev.Departure.ToString("HH:mm"));
-                output.AddAttribute("data-columnNumber", ev.Column.Number.ToString());
-                output.AddAttribute("data-height", height.ToString());
                 output.AddAttribute("data-mhr", ev.MHR);
                 output.AddAttribute("data-bookedmhr", ev.BookedMHR);
                 output.AddAttribute("data-stationname", ev.StationName);
@@ -3159,23 +3155,6 @@ namespace DayPilot.Web.Ui
                 if(!string.IsNullOrEmpty(StationNameField) && StationNameField != null)
                     stationName = DataBinder.GetPropertyValue(dataItem, StationNameField, null);
 
-                var wpnoiString = string.Empty;
-                Int64 wpnoi = 0;
-                if (!string.IsNullOrEmpty(WPNOIField) && WPNOIField != null)
-                {
-                    wpnoiString = DataBinder.GetPropertyValue(dataItem, WPNOIField, null);
-                    if (Int64.TryParse(wpnoiString, out Int64 wpnoTmp))
-                        wpnoi = wpnoTmp;
-                    else
-                        throw new FormatException(String.Format("Unable to convert '{0}' (from WPNO column) to INT.", wpnoiString));
-                }
-                
-                var wpno = string.Empty;
-                if (!string.IsNullOrEmpty(WPNOField) && WPNOField != null)
-                    wpno = DataBinder.GetPropertyValue(dataItem, WPNOField, null);
-                else
-                    throw new FormatException(String.Format("Null '{0}' (from WPNO column)", wpno));
-
                 string strStart = DataBinder.GetPropertyValue(dataItem, DataStartField, null);
                 if (!DateTime.TryParse(strStart, out start))
                 {
@@ -3230,7 +3209,7 @@ namespace DayPilot.Web.Ui
                 }
 
                 ((List<Event>)ViewState["Items"]).Add(new Event(val, StartDate, EndDate, start, end, arrivalDateTime, departureDateTime,
-                    name, resourceId, resourceName, acType, workType, dataItem, Convert.ToInt32(EventFontSize.Replace("px", "")), CellWidth, CellDuration, wpnoi, wpno, mhr, bookedMHR, stationName));
+                    name, resourceId, resourceName, acType, workType, dataItem, Convert.ToInt32(EventFontSize.Replace("px", "")), CellWidth, CellDuration,  mhr, bookedMHR, stationName));
 
             }
             //Убрать если хочется, чтобы компактно выглядело

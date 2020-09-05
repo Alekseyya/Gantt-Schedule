@@ -134,16 +134,12 @@ namespace WebApp.Controllers
             scheduler.HeaderHeight = 16;
             scheduler.DataStartField = "start";
             scheduler.ArrivalField = "arrival";
-            //scheduler.ArrivalDifDaysField = "arrivalDifDays";
             scheduler.DataEndField = "end";
             scheduler.DepartureField = "departure";
-            //scheduler.DepartureDifDaysField = "departureDifDays";
             scheduler.DataTextField = "name";
             scheduler.DataValueField = "id";
             scheduler.DataResourceField = "resource";
             scheduler.EventFontSize = "10px";
-            scheduler.WPNOIField = "wpnoi";
-            scheduler.WPNOField = "wpno";
             scheduler.MHRField = "mhr";
             scheduler.BookedMHRField = "bookedMHR";
             scheduler.DataResourceNameField = "resourceName";
@@ -210,10 +206,6 @@ namespace WebApp.Controllers
             {
                 new Resource("Дом", "A", entriesHome,  new List<WorkType> {WorkType.Sleep, WorkType.Primary, WorkType.Optional}),
                 new Resource("Работа", "B", entriesWork, new List<WorkType> {WorkType.Sleep, WorkType.Optional, WorkType.Primary}),
-                
-                //new Resource("ОТО ангар", "C", new List<string> { "PL06", "PL060" }, new List<ACType> { ACType.RRJ, ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777}),
-                //new Resource("A-ch, AOG", "D", new List<string> { "PL02", "PL020", "PL012", "PL0120" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ }),
-                //new Resource("Мойки ВС", "E", new List<string> { "PL11", "PL110" }, new List<ACType> { ACType.A32S, ACType.B737, ACType.A330, ACType.A350, ACType.B777, ACType.RRJ })
             };
             foreach (var resource in listResources)
             {
@@ -495,8 +487,6 @@ namespace WebApp.Controllers
                 dr["name"] = entry.Description;
                 dr["resource"] = resource;
                 dr["color"] = entry.HEXColorWorkColor;
-                dr["wpnoi"] = entry.WPNO_I;
-                dr["wpno"] = entry.WPNO;
                 dr["mhr"] = entry.MHR;
                 dr["bookedMHR"] = entry.BOOKED_MHR;
                 dr["resourceName"] = resourceName;
@@ -584,8 +574,6 @@ namespace WebApp.Controllers
             dt.Columns.Add("id", typeof(string));
             dt.Columns.Add("resource", typeof(string));
             dt.Columns.Add("color", typeof(string));
-            dt.Columns.Add("wpno", typeof(string));
-            dt.Columns.Add("wpnoi", typeof(Int64));
             dt.Columns.Add("mhr", typeof(string));
             dt.Columns.Add("bookedMHR", typeof(string));
             dt.Columns.Add("stationName", typeof(string));
